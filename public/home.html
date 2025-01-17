@@ -8,9 +8,9 @@
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300">
-  <nav class="bg-gray-800">
-    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-      <div class="relative flex h-16 items-center justify-between">
+  <nav class="bg-gray-800 w-full"> <!-- w-full pour s'assurer que la navbar prend toute la largeur -->
+    <div class="mx-auto px-2 sm:px-6 lg:px-8">
+      <div class="relative flex h-20 items-center justify-between">
         <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
           <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false" id="mobile-menu-button">
             <span class="sr-only">Open main menu</span>
@@ -28,31 +28,25 @@
           </div>
           <div class="hidden sm:ml-6 sm:block">
             <div class="flex space-x-4">
-              <a href="#" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Acceuil</a>
+              <a href="#" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Accueil</a>
               <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Tournois</a>
               <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Equipe</a>
               <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Matches</a>
             </div>
           </div>
         </div>
-        <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="notification-button">
-            <span class="sr-only">View notifications</span>
-            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-            </svg>
+
+        <div class="relative ml-3">
+          <button type="button" class="relative flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="profile-menu-button">
+            <span class="sr-only">Open user menu</span>
+            <img class="h-8 w-8 rounded-full" src="https://i.pinimg.com/236x/88/8c/bd/888cbdbbbb2c564197f62d5c5b7524ed.jpg" alt="rakan">
+            <span class="ml-2 text-base hidden sm:inline"><u>SPK Mupsy</u></span> <!-- Légère marge à gauche du texte -->
           </button>
 
-          <div class="relative ml-3">
-            <button type="button" class="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="profile-menu-button">
-              <span class="sr-only">Open user menu</span>
-              <img class="size-8 rounded-full" src="https://i.pinimg.com/236x/88/8c/bd/888cbdbbbb2c564197f62d5c5b7524ed.jpg" alt="rakan">
-            </button>
-            <div class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5" id="profile-dropdown">
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700">Votre Profil</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700">Vos Maitrises</a>
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700">Se déconnecter</a>
-            </div>
+          <div class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5" id="profile-dropdown">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700">Votre Profil</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700">Vos Maitrises</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700">Se déconnecter</a>
           </div>
         </div>
       </div>
@@ -68,8 +62,41 @@
     </div>
   </nav>
 
+
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 pt-20 text-center lg:pt-32">
+    <h1 class="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-gray-900 dark:text-white sm:text-7xl">
+      Noxus Arena, le créateur
+      <span class="relative whitespace-nowrap text-blue-600">
+        <span class="relative">de tournoi</span>
+      </span> 
+      pour 
+      <span class="bg-gradient-to-r from-yellow-500 via-yellow-300 to-yellow-600 bg-clip-text text-transparent font-extrabold">
+        League of Legends
+      </span>.
+    </h1>
+    <p class="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-base">
+      Créer votre compte, créer votre team, rejoigner ou créer un tournoi et on s'occupe du reste !
+    </p>
+    <div class="mt-10 flex justify-center gap-x-6">
+      <a class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base font-semibold
+      focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white 
+      hover:bg-blue-600 hover:text-slate-100 hover:scale-105 transition-transform active:bg-blue-600 active:text-slate-300 
+      focus-visible:outline-slate-900" variant="solid" color="slate" href="/login">
+        Vous connectez !
+      </a>
+      <a class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base focus:outline-none 
+        bg-red-600 text-white hover:bg-red-700 hover:scale-105 transition-transform ring-1 ring-red-600 
+        hover:ring-red-700 active:bg-red-800 focus-visible:outline-red-500 focus-visible:ring-red-300" href="/register">
+        Nous rejoindre !
+      </a>
+      
+
+    </div>
+  </div>
+  <div id="footer"></div>
   <script>
     $(document).ready(function () {
+      $('#footer').load('./ressources/footer.html');
       $('#mobile-menu-button').click(function () {
         $('#mobile-menu').toggleClass('hidden');
       });
