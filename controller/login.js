@@ -1,7 +1,7 @@
 const con = require("../models/ConnectToDatabase");
 
 module.exports = async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
 
     const query = "SELECT * FROM Users WHERE User_Email = ? and User_Password = ?";
@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
         const connection = await con.getConnection(); // Assurez-vous que getConnection est une fonction asynchrone
 
         // Exécution de la requête
-        const [results] = await connection.execute(query, [username, password]);
+        const [results] = await connection.execute(query, [email, password]);
         
         // Libération de la connexion
         connection.release();

@@ -35,7 +35,7 @@
             $('#submit').click(function(event){
                 event.preventDefault();  // Empêcher l'envoi du formulaire par défaut
                 var data = {
-                    username: $('#email').val(),  // Utilisez 'email' pour récupérer l'email
+                    email: $('#email').val(),  // Utilisez 'email' pour récupérer l'email
                     password: $('#password').val()  // Utilisez 'password' pour récupérer le mot de passe
                 };
                 $.ajax({

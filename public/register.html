@@ -46,6 +46,33 @@
         $(document).ready(function(){
             $("#submit").click(function(){
                 event.preventDefault();
+                if ($("#password").val() == $('#confirm_password').val()){
+                    var data = {
+                        email:$('#email').val(),  
+                        password: $('#password').val(),
+                        username: $("#pseudo").val(),
+                        tagline: $("#tagline").val()
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: './api/controller/register',
+                        data : data,
+                        dataType : 'json',
+                        success: function(response){
+                            if (response.success){
+                                window.location.href='./';
+                            }else {
+                                $("#title").find("p").remove();
+                                $("#title").append("<p class='text-red-500'>Inscription impossible !</p>");
+                        }
+                        },
+                        error: function(xhr, status, error) {
+                        console.error("Erreur AJAX : ", error);
+                        $("#title").find("p").remove();
+                        $("#title").append("<p class='text-red-500'>Erreur serveur. Veuillez réessayer plus tard.</p>");
+                        }   
+                    })
+                }
                 
             })
         })

@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 
 // Importer ton fichier de routes (controller/login.js)
 const loginController = require('../controller/login');
+const registerController = require('../controller/register');
 
 const API_KEY = process.env.RIOT_API_KEY;
 const RIOT_URL = "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/";
@@ -31,11 +32,22 @@ router.get('/api/user/:username/:tagline', async (req, res) => {
 // Définir la route pour la connexion
 router.post('/api/controller/login', (req, res) => {
     // Ajouter les paramètres de query à la requête
-    const { username, password } = req.body;  // Utiliser req.query pour accéder aux paramètres de la query string
-    req.body.username = username;  // Ajouter username dans req.body
+    const { email, password } = req.body; 
+     // Utiliser req.query pour accéder aux paramètres de la query string
+    req.body.email = email;  // Ajouter username dans req.body
     req.body.password = password;  // Ajouter password dans req.body
-
     loginController(req, res);  // Appeler votre contrôleur en passant la requête et la réponse
+});
+
+router.post('/api/controller/register', (req, res) => {
+  // Ajouter les paramètres de query à la requête
+  const { username, password, email, tagline } = req.body;  // Utiliser req.query pour accéder aux paramètres de la query string
+  req.body.username = username;  // Ajouter username dans req.body
+  req.body.password = password; 
+  req.body.tagline = tagline;
+  req.body.email = email; // Ajouter password dans req.body
+
+  registerController(req, res);  // Appeler votre contrôleur en passant la requête et la réponse
 });
   
 const DATA_DRAGON_URL = 'https://ddragon.leagueoflegends.com/cdn/15.1.1/data/fr_FR/champion.json';
