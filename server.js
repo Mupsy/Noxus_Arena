@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(routesApi);
 // Définir une route de base
 app.get('/', (req, res) => {
-  res.send('Hello, World! Bienvenue sur mon serveur Express.');
+  res.sendFile(path.join(__dirname,'public','home.html'));
 });
 
 app.get("/login", async (req, res) => {

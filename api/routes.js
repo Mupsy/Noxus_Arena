@@ -21,8 +21,7 @@ router.get('/api/user/:username/:tagline', async (req, res) => {
         'X-Riot-Token': API_KEY,
       }
     });
-    console.log(response);
-    res.send("TEST");
+    res.json(response.data);
   });
 
 
