@@ -59,11 +59,7 @@
         const currentMasteries = masteries.slice(startIndex, endIndex);
 
         currentMasteries.forEach((mastery) => {
-          const normalizedChampionName = mastery.championName
-            .replace(/'/g, '') // Retirer les apostrophes
-            .replace(/([a-z])([A-Z])/g, (_, before, upper) => before + upper.toLowerCase())
-            .replace(/ ([A-Z])/g, '$1') // Retirer les espaces avant les majuscules tout en gardant la majuscule
-            .replace(/^[A-Z]/, (match) => match); // Garder la première majuscule intacte
+          
 
           const dateParts = mastery.lastPlayTime.split(' ')[0].split('/');
           const formattedDate = `${dateParts[0]}/${dateParts[1]}/${dateParts[2]}`;

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="min-h-screen flex items-center justify-center w-full dark:bg-gray-950">
+        <div class="bg-white dark:bg-gray-900 shadow-md rounded-lg px-8 py-6 max-w-md">
+            <h1 id="title" class="text-2xl font-bold text-center mb-4 dark:text-gray-200">Bienvenue!</h1>
+            <form action="#">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Adresse Mail</label>
+                    <input type="email" id="email" class="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="votre@email.com" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mot de passe</label>
+                    <input type="password" id="password" class="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Entrez votre mot de passe" required>
+                </div>
+                <div class="mb-4">
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirmez votre mot de passe</label>
+                    <input type="password" id="confirm_password" class="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Confirmez votre mot de passe" required>
+                </div>
+                <div class="mb-4">
+                    <label for="pseudo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Pseudo LoL</label>
+                    <input type="text" id="pseudo" class="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Votre Pseudo LoL" required>
+                </div>
+                <div class="mb-4">
+                    <label for="tagline" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">TagLine LoL</label>
+                    <input type="text" id="tagline" class="shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Votre # après votre pseudo" required>
+                </div>
+                <div class="flex items-center justify-between mb-4">
+                    <a href="./login"
+                        class="text-xs text-indigo-500 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Vous possèdez déjà un compte ? Cliquez ici pour vous connecter.</a>
+                </div>
+                <button id="submit" type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Login</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        $(document).ready(function(){
+            $("#submit").click(function(){
+                event.preventDefault();
+                
+            })
+        })
+    </script>
+    
+</body>
+</html>

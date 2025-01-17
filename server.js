@@ -25,6 +25,11 @@ app.get("/login", async (req, res) => {
 });
 
 
+app.get("/register", async (req, res) => {
+  res.sendFile(path.join(__dirname,'public', 'register.html'));
+});
+
+
 
 
 
