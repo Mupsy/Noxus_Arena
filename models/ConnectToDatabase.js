@@ -2,8 +2,8 @@ var mariadb = require('mariadb');
 
 var con = mariadb.createPool({
     host: "100.92.95.45",
-    user: 'Mupsy',
-    password: "Kenasse00.",
+    user: '',
+    password: "",
     database:"Noxus_Arena",
     port: 3306,
     connectionLimit: 50,  // Augmenter le nombre de connexions dans le pool
