@@ -40,7 +40,7 @@
           <button type="button" class="relative flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="profile-menu-button">
             <span class="sr-only">Open user menu</span>
             <img class="h-8 w-8 rounded-full" src="https://i.pinimg.com/236x/88/8c/bd/888cbdbbbb2c564197f62d5c5b7524ed.jpg" alt="rakan">
-            <span class="ml-2 text-base hidden sm:inline"><u>SPK Mupsy</u></span> <!-- Légère marge à gauche du texte -->
+            <span id="name" class="ml-2 text-base hidden sm:inline"><u></u></span> <!-- Légère marge à gauche du texte -->
           </button>
 
           <div class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5" id="profile-dropdown">
@@ -95,7 +95,30 @@
   </div>
   <div id="footer"></div>
   <script>
+
+    function displayLoLInfo(session){
+      if(session && session.isLoggedIn){
+        $.ajax({
+          
+        })
+      }
+    }
     $(document).ready(function () {
+      var session;
+      $.ajax({
+            url: '/session-info',
+            method: 'GET',
+            success: function(response) {
+              session = response.user;
+              $('#name u').text(response.user.email);
+              displayLoLInfo(response.user.email);
+            },
+            error: function() {
+              alert('Error retrieving session data.');
+            }
+          });
+
+      console.log(session);
       $('#footer').load('./ressources/footer.html');
       $('#mobile-menu-button').click(function () {
         $('#mobile-menu').toggleClass('hidden');
