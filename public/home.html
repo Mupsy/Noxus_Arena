@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Champion Masteries</title>
+  <title>Accueil</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </head>
@@ -63,7 +63,7 @@
   </nav>
 
 
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-16 pt-20 text-center lg:pt-32">
+  <div class="bg-cover bg-center mx-auto w-full px-4 sm:px-6 lg:px-8 pb-16 pt-20 lg:pt-32 h-screen" style="background-image: url(./ressources/bg.png);">
     <h1 class="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-gray-900 dark:text-white sm:text-7xl">
       Noxus Arena, le créateur
       <span class="relative whitespace-nowrap text-blue-600">
@@ -78,21 +78,15 @@
       Créer votre compte, créer votre team, rejoigner ou créer un tournoi et on s'occupe du reste !
     </p>
     <div class="mt-10 flex justify-center gap-x-6">
-      <a class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base font-semibold
-      focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white 
-      hover:bg-blue-600 hover:text-slate-100 hover:scale-105 transition-transform active:bg-blue-600 active:text-slate-300 
-      focus-visible:outline-slate-900" variant="solid" color="slate" href="/login">
+      <a class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white hover:bg-blue-600 hover:text-slate-100 hover:scale-105 transition-transform active:bg-blue-600 active:text-slate-300 focus-visible:outline-slate-900" href="/login">
         Vous connectez !
       </a>
-      <a class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base focus:outline-none 
-        bg-red-600 text-white hover:bg-red-700 hover:scale-105 transition-transform ring-1 ring-red-600 
-        hover:ring-red-700 active:bg-red-800 focus-visible:outline-red-500 focus-visible:ring-red-300" href="/register">
+      <a class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base focus:outline-none bg-red-600 text-white hover:bg-red-700 hover:scale-105 transition-transform ring-1 ring-red-600 hover:ring-red-700 active:bg-red-800 focus-visible:outline-red-500 focus-visible:ring-red-300" href="/register">
         Nous rejoindre !
       </a>
-      
-
     </div>
   </div>
+  
   <div id="footer"></div>
   <script>
 
