@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 // Importer ton fichier de routes (controller/login.js)
 const loginController = require('../controller/login');
 const registerController = require('../controller/register');
+const LoLInfoController = require ('../controller/LoLInfoController');
 
 const API_KEY = process.env.RIOT_API_KEY;
 const RIOT_URL = "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/";
@@ -24,7 +25,11 @@ router.get('/api/user/:username/:tagline', async (req, res) => {
     res.json(response.data);
   });
 
-
+router.post("/api/lol/user/:id", async (req, res) => {
+  req.body = req.params;
+  
+  LoLInfoController(req ,res);
+});
 
 
 

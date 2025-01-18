@@ -39,7 +39,7 @@
         <div class="relative ml-3">
           <button type="button" class="relative flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="profile-menu-button">
             <span class="sr-only">Open user menu</span>
-            <img class="h-8 w-8 rounded-full" src="https://i.pinimg.com/236x/88/8c/bd/888cbdbbbb2c564197f62d5c5b7524ed.jpg" alt="rakan">
+            <img id="summoner_icon" class="h-8 w-8 rounded-full" src="" alt="">
             <span id="name" class="ml-2 text-base hidden sm:inline"><u></u></span> <!-- Légère marge à gauche du texte -->
           </button>
 
@@ -90,29 +90,57 @@
   <div id="footer"></div>
   <script>
 
-    function displayLoLInfo(session){
-      if(session && session.isLoggedIn){
-        $.ajax({
-          
-        })
-      }
-    }
+
+
     $(document).ready(function () {
-      var session;
+
+      function displayLoLInfo(session) {
+        if (session && session.isLoggedIn) {
+          const urlApi = "/api/lol/user/" + session.userId;
+          console.log('API URL:', urlApi);
+
+          $.ajax({
+            url: urlApi,
+            method: "POST",
+            success: function(response) {
+              console.log('API Response:', response);
+              
+              const summonerName = response.results?.Summoner_Name || "Unknown";
+              const summonerIconId = response.results?.Summoner_Icon_ID;
+              console.log('https://ddragon.leagueoflegends.com/cdn/15.1.1/img/profileicon/' + summonerIconId + '.png');
+              $("#name u").text(summonerName);
+
+              if (summonerIconId) {
+                $("#summoner_icon").attr(
+                  'src',
+                  'https://ddragon.leagueoflegends.com/cdn/15.1.1/img/profileicon/' + summonerIconId + '.png?timestamp=' + new Date().getTime()
+                );
+              } else {
+                console.warn('Summoner_Icon_ID is missing.');
+                $("#summoner_icon").attr('src', './default-icon.png'); // Fallback image
+              }
+            },
+            error: function(xhr, status, error) {
+              console.error('Error fetching user info:', error);
+            }
+          });
+        } else {
+          console.warn('Invalid session or user not logged in.');
+        }
+      }
+      
       $.ajax({
             url: '/session-info',
             method: 'GET',
             success: function(response) {
-              session = response.user;
               $('#name u').text(response.user.email);
-              displayLoLInfo(response.user.email);
+              displayLoLInfo(response.user);
             },
             error: function() {
               alert('Error retrieving session data.');
             }
           });
 
-      console.log(session);
       $('#footer').load('./ressources/footer.html');
       $('#mobile-menu-button').click(function () {
         $('#mobile-menu').toggleClass('hidden');

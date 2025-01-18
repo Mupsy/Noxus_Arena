@@ -43,11 +43,17 @@ module.exports = async (req, res) => {
         const rankResponse = await axios.get(`https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summId}?api_key=${process.env.RIOT_API_KEY}`);
         console.log(rankResponse.data);
         
-        let rank = "unranked"; // Valeur par défaut
-        if (rankResponse.data && rankResponse.data.length > 0) {
-            rank = rankResponse.data.tier + " " + rankResponse.data.rank; 
+        let rank = "Unranked"; // Valeur par défaut
+        const soloQueueEntries = rankResponse.data.filter(entry => entry.queueType === "RANKED_SOLO_5x5");
+
+        if (soloQueueEntries.length > 0) {
+            const soloQueueInfo = soloQueueEntries[0]; // Récupérer la première entrée
+            rank = soloQueueInfo.tier + " " + soloQueueInfo.rank;
             console.log("Rank:", rank);
+        } else {
+            console.log("No data for RANKED_SOLO_5x5");
         }
+
 
         // Insertion des informations LoL dans la base de données
         await connection.execute(insertLoLInfoQuery, [userId, username, tagline, puuid, lvl, rank, summId, iconId]);
