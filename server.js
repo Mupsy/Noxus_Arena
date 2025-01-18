@@ -56,12 +56,21 @@ app.get("/register", async (req, res) => {
 });
 
 
-
-
-
 app.get('/profile/masteries', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'profile_masteries.html'));
 });
+
+app.get('/tournament', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'tournament.html'));
+})
+
+app.get('/tournament', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'tournament.html'));
+})
+
+app.get('/teams', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'teams.html'));
+})
 
 // Lancer le serveur
 app.listen(PORT, () => {
