@@ -58,11 +58,13 @@
     </div>
   </div>
   <script>
+
     $(document).ready(function(){
 
       const fetchTeams = async () =>{
         //TODO: finir la fonction pour recuperer la donnée 'rows' de teams.js pour afficher toutes les équipes
         try {
+          //il arrive meme pas au controller
           const response = await $.ajax({
             url: '/api/controller/team',
             type: 'GET',
@@ -80,6 +82,8 @@
           console.log("Couldnt get team data")
         }
       }
+
+      fetchTeams();
 
       let champions = [];
       const fetchChampions = async () => {

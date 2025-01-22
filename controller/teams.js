@@ -2,11 +2,14 @@ const con = require("../models/ConnectToDatabase")
 const axios = require("axios");
 require("dotenv").config();
 
+//essayer de creer un chemin avec express pour envoyer 'rows'??
+
 module.exports = async (req, res) => {
     connection = await con.getConnection();
     const getTeamInfo = "SELECT Team_Name, Player_Role, Player_Champion FROM Team_Info";
 
-    const rows = await connection.execute(getTeamInfo);
+    const [rows] = await connection.execute(getTeamInfo)
+    console.log("team rows", rows);
 
     res.json({
         success: true,
