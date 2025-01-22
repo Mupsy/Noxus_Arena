@@ -9,6 +9,8 @@ const bodyParser = require('body-parser');
 const loginController = require('../controller/login');
 const registerController = require('../controller/register');
 const LoLInfoController = require ('../controller/LoLInfoController');
+const teamController = require('../controller/teams');
+
 
 const API_KEY = process.env.RIOT_API_KEY;
 const RIOT_URL = "https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/";
@@ -27,7 +29,7 @@ router.get('/api/user/:username/:tagline', async (req, res) => {
 
 router.post("/api/lol/user/:id", async (req, res) => {
   req.body = req.params;
-  
+
   LoLInfoController(req ,res);
 });
 
@@ -53,6 +55,15 @@ router.post('/api/controller/register', (req, res) => {
 
   registerController(req, res);  // Appeler votre contrôleur en passant la requête et la réponse
 });
+
+router.post('/api/controller/team', async (req, res) => {
+  try {
+    await teamController(req, res); // Ensure the controller is invoked correctly
+  } catch (error) {
+    console.error("Error in team route:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+})
   
 const DATA_DRAGON_URL = 'https://ddragon.leagueoflegends.com/cdn/15.1.1/data/fr_FR/champion.json';
   
