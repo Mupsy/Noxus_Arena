@@ -60,6 +60,27 @@
   <script>
     $(document).ready(function(){
 
+      const fetchTeams = async () =>{
+        //TODO: finir la fonction pour recuperer la donnée 'rows' de teams.js pour afficher toutes les équipes
+        try {
+          const response = await $.ajax({
+            url: '/api/controller/team',
+            type: 'GET',
+            dataType: 'json',
+          });
+          //meme pas de reponse????
+          if (response.success) {
+            console.log("got a resposne", response);
+          }else{
+            console.log("idk", response);
+          }
+        }
+        //il catch rien aussi
+        catch(error){
+          console.log("Couldnt get team data")
+        }
+      }
+
       let champions = [];
       const fetchChampions = async () => {
         try {
@@ -146,6 +167,8 @@
               console.error(error);
             }
           })
+
+        $("#submit-team").addClass("hidden");
       })
     })
   </script>
