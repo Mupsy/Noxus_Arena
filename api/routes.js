@@ -10,6 +10,7 @@ const loginController = require('../controller/login');
 const registerController = require('../controller/register');
 const LoLInfoController = require ('../controller/LoLInfoController');
 const teamController = require('../controller/teams');
+const teamInfoController = require('../controller/fetchDbInfo');
 
 
 const API_KEY = process.env.RIOT_API_KEY;
@@ -60,6 +61,15 @@ router.post('/api/controller/team', async (req, res) => {
   try {
     await teamController(req, res); // Ensure the controller is invoked correctly
   } catch (error) {
+    console.error("Error in team route:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+})
+
+router.post('/api/controller/fetchDbInfo', async (req, res) => {
+  try{
+    await teamInfoController(req, res);
+  } catch(error){
     console.error("Error in team route:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
