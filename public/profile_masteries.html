@@ -8,9 +8,68 @@
   <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300">
-  <div class="container mx-auto py-10">
-    <h1 class="text-4xl font-bold text-center mb-10 dark:text-gray-200">Top Champion Masteries</h1>
+  <nav class="bg-gray-800 w-full"> <!-- w-full pour s'assurer que la navbar prend toute la largeur -->
+    <div class="mx-auto px-2 sm:px-6 lg:px-8">
+      <div class="relative flex h-20 items-center justify-between">
+        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+          <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false" id="mobile-menu-button">
+            <span class="sr-only">Open main menu</span>
+            <svg class="block size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <svg class="hidden size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+          <div class="flex items-center">
+            <!-- Logo -->
+            <div class="shrink-0">
+              <img class="h-14 w-auto" src="/ressources/logo_noxus_arena.png" alt="Noxus Arena">
+            </div>
+          
+            <!-- Liens de navigation -->
+            <div class="hidden sm:ml-6 sm:block">
+              <div class="flex items-center space-x-7">
+                <a href="#" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Accueil</a>
+                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Tournois</a>
+                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Equipe</a>
+                <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Matches</a>
+              </div>
+            </div>
+          </div>
+          
+        </div>
 
+        <div id="Profile_Menu" class="relative ml-3" >
+          <button type="button" class="relative flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="profile-menu-button">
+            <span class="sr-only">Open user menu</span>
+            <img id="summoner_icon" class="h-8 w-8 rounded-full" src="" alt="">
+            <span id="name" class="ml-2 text-base hidden sm:inline"><u></u></span> <!-- Légère marge à gauche du texte -->
+          </button>
+
+          <div class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5" id="profile-dropdown">
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700">Votre Profil</a>
+            <a href="/profile/masteries" class="block px-4 py-2 text-sm text-gray-700">Vos Maitrises</a>
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700">Se déconnecter</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden sm:hidden" id="mobile-menu">
+      <div class="space-y-1 px-2 pb-3 pt-2">
+        <a href="#" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">Dashboard</a>
+        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Team</a>
+        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
+        <a href="#" class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container mx-auto py-10">
+
+    
     <div id="masteriesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- Les cartes seront insérées ici -->
     </div>
@@ -25,28 +84,102 @@
       <button id="nextPage" class="px-4 py-2 bg-blue-500 text-white rounded-lg dark:bg-indigo-600 dark:hover:bg-indigo-700">Suivant</button>
     </div>
   </div>
-
+  <div id="footer"></div>
   <script>
     $(document).ready(function () {
+
+
+      function displayLoLInfo(session) {
+        if (session && session.isLoggedIn) {
+          const urlApi = "/api/lol/user/" + session.userId;
+          console.log('API URL:', urlApi);
+
+          $.ajax({
+            url: urlApi,
+            method: "POST",
+            success: function(response) {
+              console.log('API Response:', response);
+              
+              const summonerName = response.results?.Summoner_Name || "Unknown";
+              const summonerIconId = response.results?.Summoner_Icon_ID;
+              console.log('https://ddragon.leagueoflegends.com/cdn/15.1.1/img/profileicon/' + summonerIconId + '.png');
+              $("#Profile_Menu").css("visibility",'visible');
+              $("#button_log_in").text("Vos tournois");
+              $("#button_log_in").attr("href","/tournois");
+              $("#button_sign_in").text("Historique de Match");
+              $("#button_sign_in").attr("href","/profile/historique");
+              $("#name u").text(summonerName);
+
+              if (summonerIconId) {
+                $("#summoner_icon").attr(
+                  'src',
+                  'https://ddragon.leagueoflegends.com/cdn/15.1.1/img/profileicon/' + summonerIconId + '.png?timestamp=' + new Date().getTime()
+                );
+              } else {
+                console.warn('Summoner_Icon_ID is missing.');
+                $("#summoner_icon").attr('src', './default-icon.png'); // Fallback image
+              }
+            },
+            error: function(xhr, status, error) {
+              console.error('Error fetching user info:', error);
+            }
+          });
+        } else {
+          console.warn('Invalid session or user not logged in.');
+        }
+      }
       let currentPage = 1;
       const itemsPerPage = 6; // Nombre d'éléments par page
       let masteries = []; // Stocker les maîtrises ici
 
-      async function fetchMasteries() {
-        try {
-          const response = await fetch('../api/user/SPK Mupsy/0001/masteries');
-          console.log(response); // Vérifier la réponse brute
+      async function fetchMasteries(session) {
+        console.log('Session: ', session)
+        if(session && session.isLoggedIn){
+          const urlApi = "/api/lol/user/" + session.userId
+          console.log(urlApi);
+          const userResponse = await fetch(urlApi, {method: "POST"});
+          
+          if (!userResponse.ok) {
+            throw new Error(`Failed to fetch user info: ${userResponse.statusText}`);
+          }
 
-          const data = await response.json(); // Assurez-vous de bien recevoir les données JSON
-          console.log(data); // Inspecter la structure des données
+          const userData = await userResponse.json();
 
-          masteries = data.championMasteries; // Accéder à la clé correcte
-          displayMasteries(); // Afficher les maîtrises de la première page
-        } catch (error) {
-          console.error('Erreur lors du chargement des maîtrises :', error);
+          console.log("User data",userData);
+
+          const masteryUrl = `../api/user/${userData.results.Summoner_Name}/${userData.results.Summoner_TagLine}/masteries`;
+          const masteryResponse = await fetch(masteryUrl);
+          if (!masteryResponse.ok) {
+            throw new Error(`Failed to fetch masteries: ${masteryResponse.statusText}`);
+          }
+
+          const masteryData = await masteryResponse.json();
+          console.log('Mastery data:', masteryData);
+
+          // Assurez-vous que la clé championMasteries existe dans la réponse
+          masteries = masteryData.championMasteries;
+          displayMasteries();
+          if (!masteries) {
+            throw new Error('Mastery data is missing championMasteries.');
+          }
+        }else{
+          //window.location.href="/";
         }
       }
 
+        
+
+      $.ajax({
+            url: '/session-info',
+            method: 'GET',
+            success: function(response) {
+              displayLoLInfo(response.user);
+              fetchMasteries(response.user);
+            },
+            error: function() {
+              alert('Error retrieving session data.');
+            }
+          });
       function displayMasteries() {
         const $container = $('#masteriesContainer');
         const startIndex = (currentPage - 1) * itemsPerPage;
@@ -105,6 +238,26 @@
           displayMasteries();
         }
       });
+
+      $('#footer').load('/ressources/footer.html');
+      $('#mobile-menu-button').click(function () {
+        $('#mobile-menu').toggleClass('hidden');
+      });
+
+      $('#profile-menu-button').click(function () {
+        $('#profile-dropdown').toggleClass('hidden');
+      });
+
+      // Close dropdown if clicked outside
+      $(document).click(function (e) {
+        if (!$(e.target).closest('#profile-menu-button, #profile-dropdown').length) {
+          $('#profile-dropdown').addClass('hidden');
+        }
+        if (!$(e.target).closest('#mobile-menu-button, #mobile-menu').length) {
+          $('#mobile-menu').addClass('hidden');
+        }
+      });
+
 
       // Charger les maîtrises au démarrage
       fetchMasteries();

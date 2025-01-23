@@ -42,7 +42,7 @@
           
         </div>
 
-        <div class="relative ml-3">
+        <div id="Profile_Menu" class="relative ml-3" style="visibility: hidden;">
           <button type="button" class="relative flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="profile-menu-button">
             <span class="sr-only">Open user menu</span>
             <img id="summoner_icon" class="h-8 w-8 rounded-full" src="" alt="">
@@ -51,7 +51,7 @@
 
           <div class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5" id="profile-dropdown">
             <a href="#" class="block px-4 py-2 text-sm text-gray-700">Votre Profil</a>
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700">Vos Maitrises</a>
+            <a href="/profile/masteries" class="block px-4 py-2 text-sm text-gray-700">Vos Maitrises</a>
             <a href="#" class="block px-4 py-2 text-sm text-gray-700">Se déconnecter</a>
           </div>
         </div>
@@ -84,10 +84,11 @@
       Créer votre compte, créer votre team, rejoigner ou créer un tournoi et on s'occupe du reste !
     </p>
     <div class="mt-10 flex justify-center gap-x-6">
-      <a class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white hover:bg-blue-600 hover:text-slate-100 hover:scale-105 transition-transform active:bg-blue-600 active:text-slate-300 focus-visible:outline-slate-900" href="/login">
+      <a  id="button_log_in" style="visibility: visible;" class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base font-semibold focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 bg-blue-600 text-white hover:bg-blue-600 hover:text-slate-100 hover:scale-105 transition-transform active:bg-blue-600 active:text-slate-300 focus-visible:outline-slate-900" href="/login">
         Vous connectez !
       </a>
-      <a class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base focus:outline-none bg-red-600 text-white hover:bg-red-700 hover:scale-105 transition-transform ring-1 ring-red-600 hover:ring-red-700 active:bg-red-800 focus-visible:outline-red-500 focus-visible:ring-red-300" href="/register">
+
+      <a id="button_sign_in" style="visibility: visible;"  class="group inline-flex items-center justify-center rounded-full py-3 px-6 text-base focus:outline-none bg-red-600 text-white hover:bg-red-700 hover:scale-105 transition-transform ring-1 ring-red-600 hover:ring-red-700 active:bg-red-800 focus-visible:outline-red-500 focus-visible:ring-red-300" href="/register">
         Nous rejoindre !
       </a>
     </div>
@@ -147,6 +148,11 @@
               const summonerName = response.results?.Summoner_Name || "Unknown";
               const summonerIconId = response.results?.Summoner_Icon_ID;
               console.log('https://ddragon.leagueoflegends.com/cdn/15.1.1/img/profileicon/' + summonerIconId + '.png');
+              $("#Profile_Menu").css("visibility",'visible');
+              $("#button_log_in").text("Vos tournois");
+              $("#button_log_in").attr("href","/tournois");
+              $("#button_sign_in").text("Historique de Match");
+              $("#button_sign_in").attr("href","/profile/historique");
               $("#name u").text(summonerName);
 
               if (summonerIconId) {
