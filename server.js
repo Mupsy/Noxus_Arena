@@ -9,6 +9,8 @@ const path = require("path");
 const con = require('./models/ConnectToDatabase');
 const routesApi = require("./api/routes");
 
+const url = require('url');
+
 
 
 const PORT = 3000;
@@ -54,6 +56,17 @@ app.get('/session-info', (req, res) => {
 app.get("/register", async (req, res) => {
   res.sendFile(path.join(__dirname,'public', 'register.html'));
 });
+
+app.get("/profile", async (req,res) => {
+  if(req.session.user && req.session.user.isLoggedIn){
+    res.sendFile(path.join(__dirname,"public",'profile.html'));
+  }else{
+    res.redirect(url.format({
+      pathname: "/",
+    }));
+  }
+  
+})
 
 
 app.get('/profile/masteries', (req, res) => {
