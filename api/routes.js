@@ -65,7 +65,7 @@ router.post('/api/controller/team', async (req, res) => {
   }
 })
   
-const DATA_DRAGON_URL = 'https://ddragon.leagueoflegends.com/cdn/15.1.1/data/fr_FR/champion.json';
+const DATA_DRAGON_URL = 'https://ddragon.leagueoflegends.com/cdn/15.3.1/data/fr_FR/champion.json';
   
 router.get('/api/user/:username/:tagline/masteries', async (req, res) => {
     try {
