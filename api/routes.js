@@ -10,6 +10,8 @@ const loginController = require('../controller/login');
 const registerController = require('../controller/register');
 const LoLInfoController = require ('../controller/LoLInfoController');
 const teamController = require('../controller/teams');
+const championController = require('../controller/ChampionController');
+const dataCollectionService = require("../controller/DataCollectionService")
 
 
 const API_KEY = process.env.RIOT_API_KEY;
@@ -147,6 +149,81 @@ router.get('/api/user/:username/:tagline/masteries', async (req, res) => {
       }
     }
   });
+// Route pour obtenir les données d'un champion
+router.get("/api/champion/:championId", async (req, res) => {
+  try {
+    const { championId } = req.params
+
+    const championData = await championController.getChampionData(championId)
+    res.json(championData)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Route pour obtenir les statistiques d'un champion
+router.get("/api/champion/:championId/stats", async (req, res) => {
+  try {
+    const { championId } = req.params
+
+    const stats = await championController.getChampionStats(championId)
+    res.json(stats)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Route pour obtenir les builds recommandés pour un champion
+router.get("/api/champion/:championId/builds", async (req, res) => {
+  try {
+    const { championId } = req.params
+    const { role } = req.query
+
+    const builds = await championController.getRecommendedBuilds(championId, role || "MID")
+    res.json(builds)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Route pour forcer l'analyse des builds d'un champion (utile pour mettre à jour les données)
+router.get("/api/champion/:championId/analyze", async (req, res) => {
+  try {
+    const { championId } = req.params
+    const { role } = req.query
+
+    // Analyser les builds des meilleurs joueurs
+    const analyzedData = await dataCollectionService.analyzeTopPlayerBuilds(championId, role || "MID")
+
+    // Sauvegarder les données
+    if (!analyzedData.error) {
+      await dataCollectionService.saveAnalyzedData(championId, role || "MID", analyzedData)
+    }
+
+    res.json(analyzedData)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Route pour obtenir la liste de tous les champions
+router.get("/api/champions", async (req, res) => {
+  try {
+    const response = await axios.get(`https://ddragon.leagueoflegends.com/cdn/13.24.1/data/fr_FR/champion.json`)
+
+    const champions = Object.values(response.data.data).map((champion) => ({
+      id: champion.key,
+      name: champion.name,
+      image: `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${champion.image.full}`,
+      tags: champion.tags,
+    }))
+
+    res.json(champions)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 
 
 module.exports = router;

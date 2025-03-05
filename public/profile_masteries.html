@@ -46,7 +46,7 @@
               
               const summonerName = response.results?.Summoner_Name || "Unknown";
               const summonerIconId = response.results?.Summoner_Icon_ID;
-              console.log('https://ddragon.leagueoflegends.com/cdn/15.1.1/img/profileicon/' + summonerIconId + '.png');
+              console.log('https://ddragon.leagueoflegends.com/cdn/15.2.1/img/profileicon/' + summonerIconId + '.png');
               $("#Profile_Menu").css("visibility",'visible');
               $("#button_log_in").text("Vos tournois");
               $("#button_log_in").attr("href","/tournois");
@@ -57,7 +57,7 @@
               if (summonerIconId) {
                 $("#summoner_icon").attr(
                   'src',
-                  'https://ddragon.leagueoflegends.com/cdn/15.1.1/img/profileicon/' + summonerIconId + '.png?timestamp=' + new Date().getTime()
+                  'https://ddragon.leagueoflegends.com/cdn/15.2.1/img/profileicon/' + summonerIconId + '.png?timestamp=' + new Date().getTime()
                 );
               } else {
                 console.warn('Summoner_Icon_ID is missing.');

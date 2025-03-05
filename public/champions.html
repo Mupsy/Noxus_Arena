@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Champions - NOXUS ARENA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .champion-card {
+      transition: all 0.3s ease;
+      background-color: #FFFFFF;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .dark .champion-card {
+      background-color: #1A1A1A;
+    }
+    
+    .champion-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #3B82F6;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+    
+    .dark .loading-spinner {
+      border-left: 4px solid #C9372C;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300">
+  <nav id="navbar" class="bg-white shadow-md dark:bg-gray-800 w-full"></nav>
+  
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Champions</h1>
+    
+    <!-- Filtres -->
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex-1 min-w-[300px]">
+        <input type="text" id="search-input" placeholder="Rechercher un champion..." class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
+      </div>
+      
+      <div class="flex flex-wrap gap-2">
+        <button class="filter-btn px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 dark:bg-red-900 dark:hover:bg-red-800" data-tag="all">Tous</button>
+        <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700" data-tag="Assassin">Assassins</button>
+        <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700" data-tag="Fighter">Combattants</button>
+        <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700" data-tag="Mage">Mages</button>
+        <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700" data-tag="Marksman">Tireurs</button>
+        <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700" data-tag="Support">Supports</button>
+        <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700" data-tag="Tank">Tanks</button>
+      </div>
+    </div>
+    
+    <!-- Liste des champions -->
+    <div id="champions-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+      <div class="col-span-full flex justify-center py-8">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+    
+    <!-- Pagination -->
+    <div class="flex justify-center mt-8">
+      <nav class="inline-flex rounded-md shadow-sm -space-x-px">
+        <button id="prev-page" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+          Précédent
+        </button>
+        <div id="page-numbers" class="flex"></div>
+        <button id="next-page" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+          Suivant
+        </button>
+      </nav>
+    </div>
+  </div>
+  
+  <div id="footer-placeholder"></div>
+  
+  <script type="module">
+    import { loadChampions, displayChampions } from './js/champions.js';
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Charger la navbar et le footer
+      fetch('/ressources/navbar.html')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('navbar').innerHTML = data;
+        });
+      
+      fetch('/ressources/footer.html')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('footer-placeholder').innerHTML = data;
+        });
+      
+      // Charger les champions
+      const champions = await loadChampions();
+      const container = document.getElementById('champions-container');
+      
+      // Variables pour la pagination
+      let currentPage = 1;
+      const championsPerPage = 18;
+      const totalPages = Math.ceil(champions.length / championsPerPage);
+      
+      // Fonction pour afficher les champions avec pagination
+      function displayPaginatedChampions(page, searchTerm = '', filterTag = 'all') {
+        const startIndex = (page - 1) * championsPerPage;
+        const endIndex = startIndex + championsPerPage;
+        const paginatedChampions = champions.slice(0, champions.length);
+        
+        displayChampions(paginatedChampions, container, searchTerm, filterTag);
+        updatePaginationControls(page, totalPages);
+      }
+      
+      // Fonction pour mettre à jour les contrôles de pagination
+      function updatePaginationControls(currentPage, totalPages) {
+        const pageNumbers = document.getElementById('page-numbers');
+        pageNumbers.innerHTML = '';
+        
+        // Afficher les numéros de page
+        for (let i = 1; i <= totalPages; i++) {
+          if (
+            i === 1 || 
+            i === totalPages || 
+            (i >= currentPage - 1 && i <= currentPage + 1)
+          ) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            pageButton.className = `px-3 py-2 border border-gray-300 ${
+              i === currentPage 
+                ? 'bg-blue-500 text-white dark:bg-red-900' 
+                : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+            }`;
+            
+            pageButton.addEventListener('click', () => {
+              currentPage = i;
+              const searchTerm = document.getElementById('search-input').value;
+              const activeFilterBtn = document.querySelector('.filter-btn.bg-blue-500, .filter-btn.dark\\:bg-red-900');
+              const activeTag = activeFilterBtn ? activeFilterBtn.getAttribute('data-tag') : 'all';
+              
+              displayPaginatedChampions(currentPage, searchTerm, activeTag);
+            });
+            
+            pageNumbers.appendChild(pageButton);
+          } else if (
+            (i === 2 && currentPage > 3) || 
+            (i === totalPages - 1 && currentPage < totalPages - 2)
+          ) {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '...';
+            ellipsis.className = 'px-3 py-2 border border-gray-300 bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+            pageNumbers.appendChild(ellipsis);
+          }
+        }
+        
+        // Activer/désactiver les boutons précédent/suivant
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages;
+      }
+      
+      // Gérer les boutons de pagination
+      document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          const searchTerm = document.getElementById('search-input').value;
+          const activeFilterBtn = document.querySelector('.filter-btn.bg-blue-500, .filter-btn.dark\\:bg-red-900');
+          const activeTag = activeFilterBtn ? activeFilterBtn.getAttribute('data-tag') : 'all';
+          
+          displayPaginatedChampions(currentPage, searchTerm, activeTag);
+        }
+      });
+      
+      document.getElementById('next-page').addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          const searchTerm = document.getElementById('search-input').value;
+          const activeFilterBtn = document.querySelector('.filter-btn.bg-blue-500, .filter-btn.dark\\:bg-red-900');
+          const activeTag = activeFilterBtn ? activeFilterBtn.getAttribute('data-tag') : 'all';
+          
+          displayPaginatedChampions(currentPage, searchTerm, activeTag);
+        }
+      });
+      
+      // Afficher tous les champions (première page)
+      displayPaginatedChampions(currentPage);
+      
+      // Gérer la recherche
+      const searchInput = document.getElementById('search-input');
+      searchInput.addEventListener('input', function() {
+        currentPage = 1; // Réinitialiser à la première page lors d'une recherche
+        const activeFilterBtn = document.querySelector('.filter-btn.bg-blue-500, .filter-btn.dark\\:bg-red-900');
+        const activeTag = activeFilterBtn ? activeFilterBtn.getAttribute('data-tag') : 'all';
+        
+        displayPaginatedChampions(currentPage, this.value, activeTag);
+      });
+      
+      // Gérer les filtres
+      document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          // Mettre à jour l'apparence des boutons
+          document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('bg-blue-500', 'dark:bg-red-900', 'text-white');
+            btn.classList.add('bg-gray-200', 'text-gray-800', 'dark:bg-gray-800', 'dark:text-gray-200');
+          });
+          
+          this.classList.remove('bg-gray-200', 'text-gray-800', 'dark:bg-gray-800', 'dark:text-gray-200');
+          this.classList.add('bg-blue-500', 'text-white', 'dark:bg-red-900');
+          
+          // Réinitialiser à la première page lors d'un changement de filtre
+          currentPage = 1;
+          
+          // Filtrer les champions
+          const tag = this.getAttribute('data-tag');
+          displayPaginatedChampions(currentPage, searchInput.value, tag);
+        });
+      });
+      
+      // Vérifier si le mode sombre est activé
+      function checkDarkMode() {
+        // Vérifier les préférences du système
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          document.documentElement.classList.add('dark');
+        }
+        
+        // Vérifier le localStorage
+        if (localStorage.getItem('darkMode') === 'true') {
+          document.documentElement.classList.add('dark');
+        } else if (localStorage.getItem('darkMode') === 'false') {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+      
+      // Appeler la fonction au chargement
+      checkDarkMode();
+    });
+  </script>
+  
+  <script type="module">
+    // Mettre à jour le fichier champions.js pour s'adapter au nouveau style
+    export function createChampionCard(champion) {
+      const card = document.createElement("div");
+      card.className = "champion-card transition-transform duration-300 hover:transform hover:scale-105";
+      
+      const link = document.createElement("a");
+      link.href = `/champion.html?id=${champion.id}`;
+      
+      const img = document.createElement("img");
+      img.src = champion.image;
+      img.alt = champion.name;
+      img.className = "w-full h-40 object-cover";
+      
+      const content = document.createElement("div");
+      content.className = "p-4";
+      
+      const name = document.createElement("h3");
+      name.textContent = champion.name;
+      name.className = "text-lg font-bold text-gray-900 dark:text-white";
+      
+      content.appendChild(name);
+      link.appendChild(img);
+      link.appendChild(content);
+      card.appendChild(link);
+      
+      return card;
+    }
+  </script>
+</body>
+</html>

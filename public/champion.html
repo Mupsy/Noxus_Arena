@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Champion - NOXUS ARENA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .champion-header {
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    
+    .champion-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.9));
+    }
+    
+    .dark .champion-header::before {
+      background: linear-gradient(to bottom, rgba(10, 10, 10, 0.5), rgba(10, 10, 10, 0.9));
+    }
+    
+    .stat-card {
+      background-color: #FFFFFF;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .dark .stat-card {
+      background-color: #1A1A1A;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .build-card {
+      background-color: #FFFFFF;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .dark .build-card {
+      background-color: #1A1A1A;
+    }
+    
+    .build-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .item-icon, .rune-icon, .spell-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 0.25rem;
+      background-color: #F3F4F6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+    
+    .dark .item-icon, .dark .rune-icon, .dark .spell-icon {
+      background-color: #2D2D2D;
+    }
+    
+    .item-icon img, .rune-icon img, .spell-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    
+    .tab-active {
+      border-bottom: 2px solid #3B82F6;
+      color: #3B82F6;
+    }
+    
+    .dark .tab-active {
+      border-bottom: 2px solid #C9372C;
+      color: #FFFFFF;
+    }
+    
+    .tier-s-plus {
+      color: #EF4444;
+    }
+    
+    .tier-s {
+      color: #F59E0B;
+    }
+    
+    .tier-a {
+      color: #10B981;
+    }
+    
+    .tier-b {
+      color: #3B82F6;
+    }
+    
+    .tier-c {
+      color: #6366F1;
+    }
+    
+    .tier-d {
+      color: #8B5CF6;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #FFFFFF;
+      color: #1F2937;
+      text-align: center;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .dark .tooltip .tooltiptext {
+      background-color: #2D2D2D;
+      color: #E4E4E4;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .skill-order {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .skill-box {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #F3F4F6;
+      border-radius: 4px;
+      font-weight: bold;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+    
+    .dark .skill-box {
+      background-color: #2D2D2D;
+    }
+    
+    .skill-q {
+      background-color: #EF4444;
+      color: white;
+    }
+    
+    .skill-w {
+      background-color: #F59E0B;
+      color: white;
+    }
+    
+    .skill-e {
+      background-color: #10B981;
+      color: white;
+    }
+    
+    .skill-r {
+      background-color: #3B82F6;
+      color: white;
+    }
+    
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #3B82F6;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+    
+    .dark .loading-spinner {
+      border-left: 4px solid #C9372C;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300">
+  <nav id="navbar-placeholder" class="bg-white shadow-md dark:bg-gray-800 w-full"></nav>
+  
+  <div class="container mx-auto px-4 py-8">
+    <!-- Champion Header -->
+    <div id="champion-header" class="champion-header h-96 rounded-lg mb-8 flex items-end shadow-lg">
+      <div class="relative z-10 p-8 w-full">
+        <div class="flex items-end justify-between">
+          <div>
+            <h1 id="champion-name" class="text-4xl font-bold text-gray-900 dark:text-white mb-2">Chargement...</h1>
+            <p id="champion-title" class="text-xl text-gray-700 dark:text-gray-300">Chargement...</p>
+          </div>
+          <div class="flex items-center">
+            <div id="champion-tier" class="text-3xl font-bold tier-s mr-4">S</div>
+            <div class="bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-70 rounded-lg p-3 shadow-md">
+              <div class="flex items-center">
+                <div class="mr-6">
+                  <div class="text-sm text-gray-500 dark:text-gray-400">Win Rate</div>
+                  <div id="win-rate" class="text-xl font-bold text-gray-900 dark:text-white">53.2%</div>
+                </div>
+                <div class="mr-6">
+                  <div class="text-sm text-gray-500 dark:text-gray-400">Pick Rate</div>
+                  <div id="pick-rate" class="text-xl font-bold text-gray-900 dark:text-white">8.7%</div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">Ban Rate</div>
+                  <div id="ban-rate" class="text-xl font-bold text-gray-900 dark:text-white">4.2%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tabs Navigation -->
+    <div class="flex border-b border-gray-200 dark:border-gray-800 mb-8">
+      <button id="tab-builds" class="px-6 py-3 font-medium tab-active">Builds</button>
+      <button id="tab-stats" class="px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Statistiques</button>
+      <button id="tab-counters" class="px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Counters</button>
+      <button id="tab-skills" class="px-6 py-3 font-medium text-gray-500 dark:text-gray-400">Compétences</button>
+    </div>
+    
+    <!-- Tab Content -->
+    <div id="tab-content">
+      <!-- Builds Tab (Default) -->
+      <div id="content-builds" class="tab-pane">
+        <!-- Role Selector -->
+        <div class="mb-8">
+          <div class="text-lg font-medium mb-4">Sélectionnez un rôle:</div>
+          <div class="flex flex-wrap space-x-2 space-y-2 sm:space-y-0">
+            <button class="role-btn px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700" data-role="TOP">Top</button>
+            <button class="role-btn px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700" data-role="JUNGLE">Jungle</button>
+            <button class="role-btn px-4 py-2 bg-blue-500 text-white dark:bg-red-900 dark:text-white rounded-lg hover:bg-blue-600 dark:hover:bg-red-800" data-role="MID">Mid</button>
+            <button class="role-btn px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700" data-role="ADC">ADC</button>
+            <button class="role-btn px-4 py-2 bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700" data-role="SUPPORT">Support</button>
+          </div>
+        </div>
+        
+        <!-- Build Types -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Standard Build -->
+          <div class="build-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Build Standard</h3>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items de départ</div>
+              <div id="standard-starter" class="flex space-x-2"></div>
+            </div>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Core Build</div>
+              <div id="standard-core" class="flex space-x-2"></div>
+            </div>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items Légendaires</div>
+              <div id="standard-legendary" class="flex space-x-2"></div>
+            </div>
+            
+            <div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items Situationnels</div>
+              <div id="standard-situational" class="flex space-x-2"></div>
+            </div>
+          </div>
+          
+          <!-- Aggressive Build -->
+          <div class="build-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Build Agressif</h3>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items de départ</div>
+              <div id="aggressive-starter" class="flex space-x-2"></div>
+            </div>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Core Build</div>
+              <div id="aggressive-core" class="flex space-x-2"></div>
+            </div>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items Légendaires</div>
+              <div id="aggressive-legendary" class="flex space-x-2"></div>
+            </div>
+            
+            <div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items Situationnels</div>
+              <div id="aggressive-situational" class="flex space-x-2"></div>
+            </div>
+          </div>
+          
+          <!-- Defensive Build -->
+          <div class="build-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Build Défensif</h3>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items de départ</div>
+              <div id="defensive-starter" class="flex space-x-2"></div>
+            </div>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Core Build</div>
+              <div id="defensive-core" class="flex space-x-2"></div>
+            </div>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items Légendaires</div>
+              <div id="defensive-legendary" class="flex space-x-2"></div>
+            </div>
+            
+            <div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Items Situationnels</div>
+              <div id="defensive-situational" class="flex space-x-2"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Runes and Summoner Spells -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <!-- Runes -->
+          <div class="build-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Runes Recommandées</h3>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Runes Primaires</div>
+              <div id="primary-runes" class="flex flex-wrap gap-2"></div>
+            </div>
+            
+            <div class="mb-6">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Runes Secondaires</div>
+              <div id="secondary-runes" class="flex flex-wrap gap-2"></div>
+            </div>
+            
+            <div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Fragments de Statistiques</div>
+              <div id="stat-shards" class="flex gap-2"></div>
+            </div>
+          </div>
+          
+          <!-- Summoner Spells and Skill Order -->
+          <div class="build-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Sorts d'Invocateur</h3>
+            <div id="summoner-spells" class="flex gap-2 mb-6"></div>
+            
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Ordre des Compétences</h3>
+            <div class="mb-4">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Premiers Niveaux</div>
+              <div id="first-three" class="skill-order"></div>
+            </div>
+            
+            <div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Priorité</div>
+              <div id="skill-priority" class="skill-order"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Playstyle Tips -->
+        <div class="build-card p-6 mb-8">
+          <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Conseils de Jeu</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Début de Partie</div>
+              <p id="early-game-tip" class="text-gray-700 dark:text-gray-300"></p>
+            </div>
+            
+            <div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Milieu de Partie</div>
+              <p id="mid-game-tip" class="text-gray-700 dark:text-gray-300"></p>
+            </div>
+            
+            <div>
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Fin de Partie</div>
+              <p id="late-game-tip" class="text-gray-700 dark:text-gray-300"></p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ML Model Info -->
+        <div class="bg-blue-50 dark:bg-gray-800 rounded-lg p-6 shadow-md">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Recommandations générées par IA</h3>
+              <p class="text-gray-600 dark:text-gray-400">Ces recommandations sont basées sur l'analyse de <span id="data-points">0</span> parties de joueurs de haut niveau.</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+              <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Indice de confiance</div>
+              <div class="flex items-center">
+                <div id="confidence-value" class="text-xl font-bold mr-2 text-gray-900 dark:text-white">92%</div>
+                <div class="w-32 h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div id="confidence-bar" class="h-full bg-green-500" style="width: 92%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Stats Tab -->
+      <div id="content-stats" class="tab-pane hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Win Rate by Role -->
+          <div class="stat-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Taux de Victoire par Rôle</h3>
+            <canvas id="winRateChart" height="250"></canvas>
+          </div>
+          
+          <!-- Pick Rate by Role -->
+          <div class="stat-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Taux de Sélection par Rôle</h3>
+            <canvas id="pickRateChart" height="250"></canvas>
+          </div>
+          
+          <!-- Win Rate by Game Length -->
+          <div class="stat-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Taux de Victoire par Durée de Partie</h3>
+            <canvas id="gameLengthChart" height="250"></canvas>
+          </div>
+          
+          <!-- Win Rate by Patch -->
+          <div class="stat-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Taux de Victoire par Patch</h3>
+            <canvas id="patchChart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Counters Tab -->
+      <div id="content-counters" class="tab-pane hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Counters -->
+          <div class="stat-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Counters</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">Champions qui sont efficaces contre ce champion.</p>
+            
+            <div id="counters-list" class="space-y-4"></div>
+          </div>
+          
+          <!-- Synergies -->
+          <div class="stat-card p-6">
+            <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Synergies</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">Champions qui fonctionnent bien avec ce champion.</p>
+            
+            <div id="synergies-list" class="space-y-4"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Skills Tab -->
+      <div id="content-skills" class="tab-pane hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Passive -->
+          <div class="stat-card p-6">
+            <div class="flex items-center mb-4">
+              <div class="mr-4">
+                <img id="passive-icon" src="/placeholder.svg" alt="Passive" class="w-16 h-16 rounded-lg shadow-md">
+              </div>
+              <div>
+                <h3 id="passive-name" class="text-xl font-bold text-gray-900 dark:text-white">Chargement...</h3>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Passive</div>
+              </div>
+            </div>
+            <p id="passive-description" class="text-gray-700 dark:text-gray-300">Chargement...</p>
+          </div>
+          
+          <!-- Q Ability -->
+          <div class="stat-card p-6">
+            <div class="flex items-center mb-4">
+              <div class="mr-4">
+                <img id="q-icon" src="/placeholder.svg" alt="Q" class="w-16 h-16 rounded-lg shadow-md">
+              </div>
+              <div>
+                <h3 id="q-name" class="text-xl font-bold text-gray-900 dark:text-white">Chargement...</h3>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Q</div>
+              </div>
+            </div>
+            <p id="q-description" class="text-gray-700 dark:text-gray-300">Chargement...</p>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Cooldown</div>
+                <div id="q-cooldown" class="text-gray-700 dark:text-gray-300">Chargement...</div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Coût</div>
+                <div id="q-cost" class="text-gray-700 dark:text-gray-300">Chargement...</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- W Ability -->
+          <div class="stat-card p-6">
+            <div class="flex items-center mb-4">
+              <div class="mr-4">
+                <img id="w-icon" src="/placeholder.svg" alt="W" class="w-16 h-16 rounded-lg shadow-md">
+              </div>
+              <div>
+                <h3 id="w-name" class="text-xl font-bold text-gray-900 dark:text-white">Chargement...</h3>
+                <div class="text-sm text-gray-500 dark:text-gray-400">W</div>
+              </div>
+            </div>
+            <p id="w-description" class="text-gray-700 dark:text-gray-300">Chargement...</p>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Cooldown</div>
+                <div id="w-cooldown" class="text-gray-700 dark:text-gray-300">Chargement...</div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Coût</div>
+                <div id="w-cost" class="text-gray-700 dark:text-gray-300">Chargement...</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- E Ability -->
+          <div class="stat-card p-6">
+            <div class="flex items-center mb-4">
+              <div class="mr-4">
+                <img id="e-icon" src="/placeholder.svg" alt="E" class="w-16 h-16 rounded-lg shadow-md">
+              </div>
+              <div>
+                <h3 id="e-name" class="text-xl font-bold text-gray-900 dark:text-white">Chargement...</h3>
+                <div class="text-sm text-gray-500 dark:text-gray-400">E</div>
+              </div>
+            </div>
+            <p id="e-description" class="text-gray-700 dark:text-gray-300">Chargement...</p>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Cooldown</div>
+                <div id="e-cooldown" class="text-gray-700 dark:text-gray-300">Chargement...</div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Coût</div>
+                <div id="e-cost" class="text-gray-700 dark:text-gray-300">Chargement...</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- R Ability -->
+          <div class="stat-card p-6">
+            <div class="flex items-center mb-4">
+              <div class="mr-4">
+                <img id="r-icon" src="/placeholder.svg" alt="R" class="w-16 h-16 rounded-lg shadow-md">
+              </div>
+              <div>
+                <h3 id="r-name" class="text-xl font-bold text-gray-900 dark:text-white">Chargement...</h3>
+                <div class="text-sm text-gray-500 dark:text-gray-400">R</div>
+              </div>
+            </div>
+            <p id="r-description" class="text-gray-700 dark:text-gray-300">Chargement...</p>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Cooldown</div>
+                <div id="r-cooldown" class="text-gray-700 dark:text-gray-300">Chargement...</div>
+              </div>
+              <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Coût</div>
+                <div id="r-cost" class="text-gray-700 dark:text-gray-300">Chargement...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="footer-placeholder"></div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Charger la navbar et le footer
+      fetch('/ressources/navbar.html')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('navbar-placeholder').innerHTML = data;
+        });
+      
+      fetch('/ressources/footer.html')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('footer-placeholder').innerHTML = data;
+        });
+      
+      // Récupérer l'ID du champion depuis l'URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const championId = urlParams.get('id');
+      
+      if (!championId) {
+        window.location.href = '/home.html';
+        return;
+      }
+      
+      // Charger les données du champion
+      loadChampionData(championId);
+      
+      // Gérer les onglets
+      document.getElementById('tab-builds').addEventListener('click', () => switchTab('builds'));
+      document.getElementById('tab-stats').addEventListener('click', () => switchTab('stats'));
+      document.getElementById('tab-counters').addEventListener('click', () => switchTab('counters'));
+      document.getElementById('tab-skills').addEventListener('click', () => switchTab('skills'));
+      
+      // Gérer les boutons de rôle
+      document.querySelectorAll('.role-btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const role = this.getAttribute('data-role');
+          
+          // Mettre à jour l'apparence des boutons
+          document.querySelectorAll('.role-btn').forEach(btn => {
+            btn.classList.remove('bg-blue-500', 'dark:bg-red-900', 'text-white');
+            btn.classList.add('bg-gray-200', 'text-gray-800', 'dark:bg-gray-800', 'dark:text-gray-200');
+          });
+          
+          this.classList.remove('bg-gray-200', 'text-gray-800', 'dark:bg-gray-800', 'dark:text-gray-200');
+          this.classList.add('bg-blue-500', 'text-white', 'dark:bg-red-900');
+          
+          // Charger les builds pour ce rôle
+          loadBuilds(championId, role);
+        });
+      });
+    });
+    
+    // Fonction pour changer d'onglet
+    function switchTab(tabName) {
+      // Mettre à jour les boutons d'onglet
+      document.querySelectorAll('#tab-builds, #tab-stats, #tab-counters, #tab-skills').forEach(tab => {
+        tab.classList.remove('tab-active');
+        tab.classList.add('text-gray-500', 'dark:text-gray-400');
+      });
+      
+      document.getElementById(`tab-${tabName}`).classList.add('tab-active');
+      document.getElementById(`tab-${tabName}`).classList.remove('text-gray-500', 'dark:text-gray-400');
+      
+      // Afficher le contenu de l'onglet sélectionné
+      document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.add('hidden');
+      });
+      
+      document.getElementById(`content-${tabName}`).classList.remove('hidden');
+      
+      // Initialiser les graphiques si on est sur l'onglet stats
+      if (tabName === 'stats') {
+        initCharts();
+      }
+    }
+    
+    // Fonction pour charger les données du champion
+    async function loadChampionData(championId) {
+      try {
+        // Charger les données de base du champion
+        const championResponse = await fetch(`/api/champion/${championId}`);
+        const championData = await championResponse.json();
+        
+        // Mettre à jour l'interface avec les données du champion
+        document.getElementById('champion-name').textContent = championData.name;
+        document.getElementById('champion-title').textContent = championData.title;
+        document.getElementById('champion-header').style.backgroundImage = `url('${championData.splash}')`;
+        
+        // Charger les statistiques du champion
+        const statsResponse = await fetch(`/api/champion/${championId}/stats`);
+        const statsData = await statsResponse.json();
+        
+        // Mettre à jour les statistiques
+        document.getElementById('win-rate').textContent = `${statsData.overall.winRate.toFixed(1)}%`;
+        document.getElementById('pick-rate').textContent = `${statsData.overall.pickRate.toFixed(1)}%`;
+        document.getElementById('ban-rate').textContent = `${statsData.overall.banRate.toFixed(1)}%`;
+        
+        // Mettre à jour le tier
+        const tierElement = document.getElementById('champion-tier');
+        tierElement.textContent = statsData.overall.tier;
+        
+        // Ajouter la classe de couleur correspondante
+        tierElement.className = ''; // Réinitialiser les classes
+        tierElement.classList.add('text-3xl', 'font-bold', 'mr-4', `tier-${statsData.overall.tier.toLowerCase().replace('+', '-plus')}`);
+        
+        // Charger les counters et synergies
+        loadCountersAndSynergies(statsData.counters, statsData.synergies);
+        
+        // Charger les compétences
+        loadSkills(championData);
+        
+        // Charger les builds pour le rôle principal
+        loadBuilds(championId, statsData.overall.primaryRole);
+        
+        // Mettre à jour le bouton de rôle actif
+        document.querySelectorAll('.role-btn').forEach(btn => {
+          btn.classList.remove('bg-blue-500', 'dark:bg-red-900', 'text-white');
+          btn.classList.add('bg-gray-200', 'text-gray-800', 'dark:bg-gray-800', 'dark:text-gray-200');
+        });
+        
+        const activeRoleBtn = document.querySelector(`.role-btn[data-role="${statsData.overall.primaryRole}"]`);
+        if (activeRoleBtn) {
+          activeRoleBtn.classList.remove('bg-gray-200', 'text-gray-800', 'dark:bg-gray-800', 'dark:text-gray-200');
+          activeRoleBtn.classList.add('bg-blue-500', 'text-white', 'dark:bg-red-900');
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des données du champion:', error);
+      }
+    }
+    
+    // Fonction pour charger les builds
+    async function loadBuilds(championId, role) {
+      try {
+        const response = await fetch(`/api/champion/${championId}/builds?role=${role}`);
+        const buildsData = await response.json();
+        
+        // Mettre à jour les builds
+        updateBuildItems('standard', buildsData.builds.standard);
+        updateBuildItems('aggressive', buildsData.builds.aggressive);
+        updateBuildItems('defensive', buildsData.builds.defensive);
+        
+        // Mettre à jour les runes
+        updateRunes(buildsData.runes.standard);
+        
+        // Mettre à jour les sorts d'invocateur
+        updateSummonerSpells(buildsData.summonerSpells);
+        
+        // Mettre à jour l'ordre des compétences
+        updateSkillOrder(buildsData.skillOrders);
+        
+        // Mettre à jour les conseils de jeu
+        document.getElementById('early-game-tip').textContent = buildsData.playstyleTips.earlyGame;
+        document.getElementById('mid-game-tip').textContent = buildsData.playstyleTips.midGame;
+        document.getElementById('late-game-tip').textContent = buildsData.playstyleTips.lateGame;
+        
+        // Mettre à jour les informations du modèle ML
+        document.getElementById('data-points').textContent = buildsData.dataPoints.toLocaleString();
+        document.getElementById('confidence-value').textContent = `${buildsData.confidence.toFixed(1)}%`;
+        document.getElementById('confidence-bar').style.width = `${buildsData.confidence}%`;
+        
+        // Ajuster la couleur de la barre de confiance
+        const confidenceBar = document.getElementById('confidence-bar');
+        if (buildsData.confidence >= 90) {
+          confidenceBar.className = 'h-full bg-green-500';
+        } else if (buildsData.confidence >= 70) {
+          confidenceBar.className = 'h-full bg-yellow-500';
+        } else {
+          confidenceBar.className = 'h-full bg-red-500';
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des builds:', error);
+      }
+    }
+    
+    // Fonction pour mettre à jour les items d'un build
+    function updateBuildItems(buildType, buildData) {
+      // Mettre à jour les items de départ
+      const starterContainer = document.getElementById(`${buildType}-starter`);
+      starterContainer.innerHTML = '';
+      
+      buildData.starter.forEach(itemId => {
+        starterContainer.appendChild(createItemElement(itemId));
+      });
+      
+      // Mettre à jour les items core
+      const coreContainer = document.getElementById(`${buildType}-core`);
+      coreContainer.innerHTML = '';
+      
+      buildData.core.forEach(itemId => {
+        coreContainer.appendChild(createItemElement(itemId));
+      });
+      
+      // Mettre à jour les items légendaires
+      const legendaryContainer = document.getElementById(`${buildType}-legendary`);
+      legendaryContainer.innerHTML = '';
+      
+      buildData.legendary.forEach(itemId => {
+        legendaryContainer.appendChild(createItemElement(itemId));
+      });
+      
+      // Mettre à jour les items situationnels
+      const situationalContainer = document.getElementById(`${buildType}-situational`);
+      situationalContainer.innerHTML = '';
+      
+      buildData.situational.forEach(itemId => {
+        situationalContainer.appendChild(createItemElement(itemId));
+      });
+    }
+    
+    // Fonction pour créer un élément d'item
+    function createItemElement(itemId) {
+      const itemElement = document.createElement('div');
+      itemElement.className = 'item-icon tooltip';
+      
+      const img = document.createElement('img');
+      img.src = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/${itemId}.png`;
+      img.alt = `Item ${itemId}`;
+      
+      const tooltip = document.createElement('span');
+      tooltip.className = 'tooltiptext';
+      tooltip.textContent = `Item ${itemId}`;
+      
+      itemElement.appendChild(img);
+      itemElement.appendChild(tooltip);
+      
+      return itemElement;
+    }
+    
+    // Fonction pour mettre à jour les runes
+    function updateRunes(runesData) {
+      // Mettre à jour les runes primaires
+      const primaryRunesContainer = document.getElementById('primary-runes');
+      primaryRunesContainer.innerHTML = '';
+      
+      // Ajouter la rune principale
+      primaryRunesContainer.appendChild(createRuneElement(runesData.primaryRune));
+      
+      // Ajouter les runes primaires secondaires
+      runesData.primaryRunes.forEach(runeId => {
+        primaryRunesContainer.appendChild(createRuneElement(runeId));
+      });
+      
+      // Mettre à jour les runes secondaires
+      const secondaryRunesContainer = document.getElementById('secondary-runes');
+      secondaryRunesContainer.innerHTML = '';
+      
+      runesData.secondaryRunes.forEach(runeId => {
+        secondaryRunesContainer.appendChild(createRuneElement(runeId));
+      });
+      
+      // Mettre à jour les fragments de statistiques
+      const statShardsContainer = document.getElementById('stat-shards');
+      statShardsContainer.innerHTML = '';
+      
+      runesData.statShards.forEach(shardId => {
+        statShardsContainer.appendChild(createRuneElement(shardId));
+      });
+    }
+    
+    // Fonction pour créer un élément de rune
+    function createRuneElement(runeId) {
+      const runeElement = document.createElement('div');
+      runeElement.className = 'rune-icon tooltip';
+      
+      const img = document.createElement('img');
+      img.src = `https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/${runeId}.png`;
+      img.alt = `Rune ${runeId}`;
+      
+      const tooltip = document.createElement('span');
+      tooltip.className = 'tooltiptext';
+      tooltip.textContent = `Rune ${runeId}`;
+      
+      runeElement.appendChild(img);
+      runeElement.appendChild(tooltip);
+      
+      return runeElement;
+    }
+    
+    // Fonction pour mettre à jour les sorts d'invocateur
+    function updateSummonerSpells(spells) {
+      const spellsContainer = document.getElementById('summoner-spells');
+      spellsContainer.innerHTML = '';
+      
+      spells.forEach(spellId => {
+        const spellElement = document.createElement('div');
+        spellElement.className = 'spell-icon tooltip';
+        
+        const img = document.createElement('img');
+        img.src = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/spell/Summoner${getSpellName(spellId)}.png`;
+        img.alt = `Sort ${spellId}`;
+        
+        const tooltip = document.createElement('span');
+        tooltip.className = 'tooltiptext';
+        tooltip.textContent = getSpellName(spellId);
+        
+        spellElement.appendChild(img);
+        spellElement.appendChild(tooltip);
+        
+        spellsContainer.appendChild(spellElement);
+      });
+    }
+    
+    // Fonction pour obtenir le nom d'un sort d'invocateur à partir de son ID
+    function getSpellName(spellId) {
+      const spells = {
+        1: 'Cleanse',
+        3: 'Exhaust',
+        4: 'Flash',
+        6: 'Ghost',
+        7: 'Heal',
+        11: 'Smite',
+        12: 'Teleport',
+        14: 'Ignite',
+        21: 'Barrier',
+        32: 'Mark' // Snowball in ARAM
+      };
+      
+      return spells[spellId] || 'Flash'; // Par défaut, retourner Flash
+    }
+    
+    // Fonction pour mettre à jour l'ordre des compétences
+    function updateSkillOrder(skillOrders) {
+      // Mettre à jour les 3 premiers niveaux
+      const firstThreeContainer = document.getElementById('first-three');
+      firstThreeContainer.innerHTML = '';
+      
+      skillOrders.firstThree.forEach((skill, index) => {
+        const skillBox = document.createElement('div');
+        skillBox.className = `skill-box skill-${skill.toLowerCase()}`;
+        skillBox.textContent = skill;
+        
+        const levelBox = document.createElement('div');
+        levelBox.className = 'skill-box';
+        levelBox.textContent = index + 1;
+        
+        firstThreeContainer.appendChild(levelBox);
+        firstThreeContainer.appendChild(skillBox);
+      });
+      
+      // Mettre à jour la priorité
+      const priorityContainer = document.getElementById('skill-priority');
+      priorityContainer.innerHTML = '';
+      
+      // Ajouter R en premier (toujours prioritaire quand disponible)
+      const rBox = document.createElement('div');
+      rBox.className = 'skill-box skill-r';
+      rBox.textContent = 'R';
+      priorityContainer.appendChild(rBox);
+      
+      // Ajouter les autres compétences dans l'ordre de priorité
+      skillOrders.priority.forEach(skill => {
+        const skillBox = document.createElement('div');
+        skillBox.className = `skill-box skill-${skill.toLowerCase()}`;
+        skillBox.textContent = skill;
+        priorityContainer.appendChild(skillBox);
+      });
+    }
+    
+    // Fonction pour charger les counters et synergies
+    function loadCountersAndSynergies(counters, synergies) {
+      // Mettre à jour les counters
+      const countersContainer = document.getElementById('counters-list');
+      countersContainer.innerHTML = '';
+      
+      counters.forEach(counter => {
+        const counterElement = document.createElement('div');
+        counterElement.className = 'flex items-center justify-between';
+        
+        const championInfo = document.createElement('div');
+        championInfo.className = 'flex items-center';
+        
+        const img = document.createElement('img');
+        img.src = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${getChampionKeyById(counter.championId)}.png`;
+        img.alt = `Champion ${counter.championId}`;
+        img.className = 'w-12 h-12 rounded-full mr-3 shadow-md';
+        
+        const name = document.createElement('div');
+        name.textContent = getChampionNameById(counter.championId);
+        name.className = 'font-medium text-gray-900 dark:text-white';
+        
+        championInfo.appendChild(img);
+        championInfo.appendChild(name);
+        
+        const stats = document.createElement('div');
+        stats.className = 'text-right';
+        
+        const winRate = document.createElement('div');
+        winRate.textContent = `${counter.winRate.toFixed(1)}% Win Rate`;
+        winRate.className = 'font-bold text-red-500';
+        
+        const games = document.createElement('div');
+        games.textContent = `${counter.games.toLocaleString()} parties`;
+        games.className = 'text-sm text-gray-500 dark:text-gray-400';
+        
+        stats.appendChild(winRate);
+        stats.appendChild(games);
+        
+        counterElement.appendChild(championInfo);
+        counterElement.appendChild(stats);
+        
+        countersContainer.appendChild(counterElement);
+      });
+      
+      // Mettre à jour les synergies
+      const synergiesContainer = document.getElementById('synergies-list');
+      synergiesContainer.innerHTML = '';
+      
+      synergies.forEach(synergy => {
+        const synergyElement = document.createElement('div');
+        synergyElement.className = 'flex items-center justify-between';
+        
+        const championInfo = document.createElement('div');
+        championInfo.className = 'flex items-center';
+        
+        const img = document.createElement('img');
+        img.src = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${getChampionKeyById(synergy.championId)}.png`;
+        img.alt = `Champion ${synergy.championId}`;
+        img.className = 'w-12 h-12 rounded-full mr-3 shadow-md';
+        
+        const name = document.createElement('div');
+        name.textContent = getChampionNameById(synergy.championId);
+        name.className = 'font-medium text-gray-900 dark:text-white';
+        
+        championInfo.appendChild(img);
+        championInfo.appendChild(name);
+        
+        const stats = document.createElement('div');
+        stats.className = 'text-right';
+        
+        const winRate = document.createElement('div');
+        winRate.textContent = `${synergy.winRate.toFixed(1)}% Win Rate`;
+        winRate.className = 'font-bold text-green-500';
+        
+        const games = document.createElement('div');
+        games.textContent = `${synergy.games.toLocaleString()} parties`;
+        games.className = 'text-sm text-gray-500 dark:text-gray-400';
+        
+        stats.appendChild(winRate);
+        stats.appendChild(games);
+        
+        synergyElement.appendChild(championInfo);
+        synergyElement.appendChild(stats);
+        
+        synergiesContainer.appendChild(synergyElement);
+      });
+    }
+    
+    // Fonction pour obtenir la clé d'un champion à partir de son ID
+    function getChampionKeyById(id) {
+      // Cette fonction devrait idéalement récupérer les données depuis une API
+      // Pour l'exemple, nous utilisons une correspondance statique pour quelques champions
+      const championsMap = {
+        266: 'Aatrox',
+        103: 'Ahri',
+        84: 'Akali',
+        12: 'Alistar',
+        32: 'Amumu',
+        34: 'Anivia',
+        1: 'Annie',
+        22: 'Ashe',
+        136: 'AurelionSol',
+        268: 'Azir',
+        432: 'Bard',
+        53: 'Blitzcrank',
+        63: 'Brand',
+        201: 'Braum',
+        51: 'Caitlyn',
+        164: 'Camille',
+        69: 'Cassiopeia',
+        31: 'Chogath',
+        42: 'Corki'
+      };
+      
+      return championsMap[id] || 'Annie'; // Par défaut, retourner Annie
+    }
+    
+    // Fonction pour obtenir le nom d'un champion à partir de son ID
+    function getChampionNameById(id) {
+      // Cette fonction devrait idéalement récupérer les données depuis une API
+      // Pour l'exemple, nous utilisons une correspondance statique pour quelques champions
+      const championsMap = {
+        266: 'Aatrox',
+        103: 'Ahri',
+        84: 'Akali',
+        12: 'Alistar',
+        32: 'Amumu',
+        34: 'Anivia',
+        1: 'Annie',
+        22: 'Ashe',
+        136: 'Aurelion Sol',
+        268: 'Azir',
+        432: 'Bard',
+        53: 'Blitzcrank',
+        63: 'Brand',
+        201: 'Braum',
+        51: 'Caitlyn',
+        164: 'Camille',
+        69: 'Cassiopeia',
+        31: 'Cho\'Gath',
+        42: 'Corki'
+      };
+      
+      return championsMap[id] || 'Champion inconnu';
+    }
+    
+    // Fonction pour charger les compétences
+    function loadSkills(championData) {
+      // Mettre à jour le passif
+      document.getElementById('passive-icon').src = championData.passive.image;
+      document.getElementById('passive-name').textContent = championData.passive.name;
+      document.getElementById('passive-description').innerHTML = championData.passive.description;
+      
+      // Mettre à jour les compétences
+      const abilities = ['q', 'w', 'e', 'r'];
+      
+      abilities.forEach((ability, index) => {
+        if (championData.spells[index]) {
+          document.getElementById(`${ability}-icon`).src = championData.spells[index].image;
+          document.getElementById(`${ability}-name`).textContent = championData.spells[index].name;
+          document.getElementById(`${ability}-description`).innerHTML = championData.spells[index].description;
+          document.getElementById(`${ability}-cooldown`).textContent = championData.spells[index].cooldown.join('/') + ' secondes';
+          document.getElementById(`${ability}-cost`).textContent = championData.spells[index].cost.join('/');
+        }
+      });
+    }
+    
+    // Fonction pour initialiser les graphiques
+    function initCharts() {
+      // Configuration des couleurs pour le thème clair/sombre
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      const textColor = isDarkMode ? '#E4E4E4' : '#1F2937';
+      const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+      
+      Chart.defaults.color = textColor;
+      Chart.defaults.scale.grid.color = gridColor;
+      
+      // Graphique de taux de victoire par rôle
+      const winRateCtx = document.getElementById('winRateChart').getContext('2d');
+      new Chart(winRateCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
+          datasets: [{
+            label: 'Taux de victoire (%)',
+            data: [51.2, 48.7, 53.5, 49.8, 47.3],
+            backgroundColor: '#3B82F6',
+            borderColor: '#3B82F6',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 45,
+              max: 55
+            }
+          }
+        }
+      });
+      
+      // Graphique de taux de sélection par rôle
+      const pickRateCtx = document.getElementById('pickRateChart').getContext('2d');
+      new Chart(pickRateCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
+          datasets: [{
+            label: 'Taux de sélection (%)',
+            data: [2.1, 0.5, 8.7, 1.2, 0.3],
+            backgroundColor: '#F59E0B',
+            borderColor: '#F59E0B',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+      
+      // Graphique de taux de victoire par durée de partie
+      const gameLengthCtx = document.getElementById('gameLengthChart').getContext('2d');
+      new Chart(gameLengthCtx, {
+        type: 'line',
+        data: {
+          labels: ['0-15', '15-20', '20-25', '25-30', '30-35', '35+'],
+          datasets: [{
+            label: 'Taux de victoire (%)',
+            data: [42.5, 48.3, 52.7, 54.1, 51.8, 49.2],
+            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+            borderColor: '#10B981',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 40,
+              max: 60
+            }
+          }
+        }
+      });
+      
+      // Graphique de taux de victoire par patch
+      const patchCtx = document.getElementById('patchChart').getContext('2d');
+      new Chart(patchCtx, {
+        type: 'line',
+        data: {
+          labels: ['13.19', '13.20', '13.21', '13.22', '13.23', '13.24'],
+          datasets: [{
+            label: 'Taux de victoire (%)',
+            data: [49.8, 51.2, 50.7, 52.3, 53.1, 52.8],
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            borderColor: '#3B82F6',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 45,
+              max: 55
+            }
+          }
+        }
+      });
+    }
+    
+    // Vérifier si le mode sombre est activé
+    function checkDarkMode() {
+      // Vérifier les préférences du système
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+      
+      // Vérifier le localStorage
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+      } else if (localStorage.getItem('darkMode') === 'false') {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+    
+    // Appeler la fonction au chargement
+    checkDarkMode();
+  </script>
+</body>
+</html>
