@@ -67,7 +67,49 @@ app.get("/profile", async (req,res) => {
   }
   
 })
+// Route pour récupérer l'historique des parties
+app.get("/matches/history", async (req, res) => {
+  try {
+    // Vérifier si l'utilisateur est connecté
+    if (!req.session.user && !req.session.user.isLoggedIn) {
+      return res.status(401).json({ error: "Vous devez être connecté pour voir votre historique" })
+    }
 
+    const matchHistoryService = require("./services/MatchHistoryService")
+    const history = await matchHistoryService.getMatchHistory(req.session.user.userId)
+
+    res.json(history)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Route pour récupérer les statistiques récentes
+app.get("/matches/stats", async (req, res) => {
+  try {
+    // Vérifier si l'utilisateur est connecté
+    if (!req.session.user && !req.session.user.isLoggedIn) {
+      return res.status(401).json({ error: "Vous devez être connecté pour voir vos statistiques" })
+    }
+
+    const matchHistoryService = require("./services/MatchHistoryService")
+    const stats = await matchHistoryService.getRecentStats(req.session.user.userId)
+
+    res.json(stats)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+app.get("/match", async (req, res) => {
+  if (req.session.user && req.session.user.isLoggedIn) {
+    res.sendFile(path.join(__dirname, "public", "match-history.html"));
+  } else {
+    res.redirect(url.format({
+      pathname: "/",
+    }));
+  }
+});
 
 app.get('/profile/masteries', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'profile_masteries.html'));

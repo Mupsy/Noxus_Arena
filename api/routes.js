@@ -149,8 +149,11 @@ router.get('/api/user/:username/:tagline/masteries', async (req, res) => {
       }
     }
   });
+// Ajoutez ces routes à votre fichier routes.js existant
+
+
 // Route pour obtenir les données d'un champion
-router.get("/api/champion/:championId", async (req, res) => {
+router.get("/champion/:championId", async (req, res) => {
   try {
     const { championId } = req.params
 
@@ -162,7 +165,7 @@ router.get("/api/champion/:championId", async (req, res) => {
 })
 
 // Route pour obtenir les statistiques d'un champion
-router.get("/api/champion/:championId/stats", async (req, res) => {
+router.get("/champion/:championId/stats", async (req, res) => {
   try {
     const { championId } = req.params
 
@@ -174,7 +177,7 @@ router.get("/api/champion/:championId/stats", async (req, res) => {
 })
 
 // Route pour obtenir les builds recommandés pour un champion
-router.get("/api/champion/:championId/builds", async (req, res) => {
+router.get("/champion/:championId/builds", async (req, res) => {
   try {
     const { championId } = req.params
     const { role } = req.query
@@ -187,7 +190,7 @@ router.get("/api/champion/:championId/builds", async (req, res) => {
 })
 
 // Route pour forcer l'analyse des builds d'un champion (utile pour mettre à jour les données)
-router.get("/api/champion/:championId/analyze", async (req, res) => {
+router.get("/champion/:championId/analyze", async (req, res) => {
   try {
     const { championId } = req.params
     const { role } = req.query
@@ -207,14 +210,14 @@ router.get("/api/champion/:championId/analyze", async (req, res) => {
 })
 
 // Route pour obtenir la liste de tous les champions
-router.get("/api/champions", async (req, res) => {
+router.get("/champions", async (req, res) => {
   try {
-    const response = await axios.get(`https://ddragon.leagueoflegends.com/cdn/13.24.1/data/fr_FR/champion.json`)
+    const response = await axios.get(`https://ddragon.leagueoflegends.com/cdn/15.3.1/data/fr_FR/champion.json`)
 
     const champions = Object.values(response.data.data).map((champion) => ({
       id: champion.key,
       name: champion.name,
-      image: `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${champion.image.full}`,
+      image: `https://ddragon.leagueoflegends.com/cdn/15.3.1/img/champion/${champion.image.full}`,
       tags: champion.tags,
     }))
 
@@ -224,6 +227,92 @@ router.get("/api/champions", async (req, res) => {
   }
 })
 
+// Modifier la route pour les recommandations
+router.get("/recommend/:summonerName/:championId/:role", async (req, res) => {
+  try {
+    const { summonerName, championId, role } = req.params
+
+    // Utiliser le RecommendationController pour générer des recommandations
+    const recommendationController = require("../controller/RecommendationController")
+    const recommendations = await recommendationController.generateRecommendations(summonerName, championId, role)
+
+    res.json(recommendations)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+router.get('/api/matches', async (req, res) => {
+  try {
+    const { puuid, page = 0, count = 5 } = req.query;
+    
+    if (!puuid) {
+      return res.status(400).json({ error: 'PUUID requis' });
+    }
+    
+    // Récupérer les IDs de match
+    const start = parseInt(page) * parseInt(count);
+    const matchIds = await getMatchIds(puuid, start, parseInt(count));
+    
+    if (matchIds.length === 0) {
+      return res.json({ matches: [] });
+    }
+    
+    // Récupérer les détails de chaque match
+    const matchPromises = matchIds.map(id => getMatchDetails(id));
+    const matches = await Promise.all(matchPromises);
+    
+    // Filtrer les matchs null (en cas d'erreur)
+    const validMatches = matches.filter(match => match !== null);
+    
+    res.json({ matches: validMatches });
+  } catch (error) {
+    console.error('Erreur lors de la récupération des matchs:', error);
+    res.status(500).json({ error: 'Erreur lors de la récupération des matchs' });
+  }
+});
+
+// Fonctions auxiliaires pour l'API
+async function getMatchIds(puuid, start = 0, count = 10) {
+  try {
+    const response = await axios.get(
+      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`,
+      {
+        headers: {
+          'X-Riot-Token': API_KEY
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des IDs de match:', error);
+    return [];
+  }
+}
+
+async function getMatchDetails(matchId) {
+  try {
+    const response = await axios.get(
+      `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`,
+      {
+        headers: {
+          'X-Riot-Token': API_KEY
+        }
+      }
+    );
+    
+    return response.data;
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des détails du match ${matchId}:`, error);
+    return null;
+  }
+}
 
 
-module.exports = router;
+
+module.exports = router
+
+
+
+

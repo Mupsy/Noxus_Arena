@@ -174,14 +174,33 @@ class RecommendationController {
   // Génère des recommandations basées sur l'analyse des données
   async generateRecommendations(summonerName, championId, role) {
     try {
-      // 1. Analyser les données du joueur avec ce champion
-      const playerData = await this.analyzeChampionData(summonerName, championId)
-
-      // 2. Récupérer les données globales pour ce champion (meilleurs joueurs)
+      // Au lieu d'analyser les données du joueur, récupérer uniquement les données globales
       const globalData = await this.getGlobalChampionData(championId, role)
 
-      // 3. Comparer et générer des recommandations
-      const recommendations = this.compareAndRecommend(playerData, globalData)
+      // Créer une structure de données simulée pour le joueur (données vides)
+      const playerData = {
+        matchesAnalyzed: 0,
+        winRate: 50,
+        avgKDA: 2.5,
+        recommendedItems: [],
+        recommendedRunes: [],
+        recommendedSummonerSpells: [],
+      }
+
+      // Générer des recommandations basées uniquement sur les données globales
+      const recommendations = {
+        summary: `Basé sur l'analyse des meilleurs joueurs, le taux de victoire moyen avec ce champion est de ${globalData.winRate.toFixed(1)}%.`,
+        itemsRecommendation: `Objets recommandés: ${globalData.recommendedItems
+          .slice(0, 3)
+          .map((i) => `Item ${i.itemId}`)
+          .join(", ")}.`,
+        runesRecommendation: `Runes recommandées: ${globalData.recommendedRunes
+          .slice(0, 3)
+          .map((r) => `Rune ${r.runeId}`)
+          .join(", ")}.`,
+        spellsRecommendation: `Sorts d'invocateur recommandés: ${globalData.recommendedSummonerSpells.map((s) => `Sort ${s.spellId}`).join(", ")}.`,
+        playstyleRecommendation: this.generatePlaystyleRecommendation(playerData, globalData),
+      }
 
       return recommendations
     } catch (error) {
@@ -193,8 +212,41 @@ class RecommendationController {
   // Récupère les données globales pour un champion (à partir des meilleurs joueurs)
   async getGlobalChampionData(championId, role) {
     try {
-      // Simuler des données globales (dans une implémentation réelle, vous récupéreriez
-      // ces données à partir d'une base de données ou d'une API externe)
+      // Utiliser le DataCollectionService pour obtenir les données des joueurs d'élite
+      const dataCollectionService = require("./DataCollectionService")
+      const eliteData = await dataCollectionService.analyzeTopPlayerBuilds(championId, role, 10, 20)
+
+      // Si nous avons des données réelles, les utiliser
+      if (!eliteData.error && eliteData.matchesAnalyzed > 0) {
+        // Extraire les données pertinentes
+        return {
+          winRate: eliteData.winRate || 52.3,
+          pickRate: 8.7, // Donnée non disponible directement, utiliser une valeur par défaut
+          banRate: 4.2, // Donnée non disponible directement, utiliser une valeur par défaut
+          recommendedItems: eliteData.builds?.standard?.core?.map((itemId) => ({ itemId, frequency: 85 })) || [
+            { itemId: 3157, frequency: 87.5 },
+            { itemId: 3089, frequency: 82.1 },
+            { itemId: 3135, frequency: 76.8 },
+            { itemId: 3165, frequency: 65.3 },
+            { itemId: 3152, frequency: 58.9 },
+            { itemId: 3116, frequency: 52.4 },
+          ],
+          recommendedRunes: eliteData.runes?.standard?.primaryRunes?.map((runeId) => ({ runeId, frequency: 85 })) || [
+            { runeId: 8214, frequency: 92.1 },
+            { runeId: 8226, frequency: 85.7 },
+            { runeId: 8210, frequency: 78.3 },
+            { runeId: 8237, frequency: 72.5 },
+            { runeId: 8345, frequency: 68.9 },
+            { runeId: 8347, frequency: 65.2 },
+          ],
+          recommendedSummonerSpells: eliteData.summonerSpells?.map((spellId) => ({ spellId, frequency: 90 })) || [
+            { spellId: 4, frequency: 95.8 },
+            { spellId: 12, frequency: 87.3 },
+          ],
+        }
+      }
+
+      // Sinon, utiliser des données simulées
       return {
         winRate: 52.3,
         pickRate: 8.7,

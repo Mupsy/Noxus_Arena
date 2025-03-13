@@ -6,8 +6,8 @@ module.exports = async (req, res) => {
     const { email, password, username, tagline } = req.body;
 
     const insertUserQuery = "INSERT INTO Users (User_Email, User_Password, NA_Rank) VALUES (?, ?, 0)";
-    const selectUserIdQuery = "SELECT id, User_Email FROM Users WHERE User_Email = ?";
-    const insertLoLInfoQuery = "INSERT INTO LoL_Info (User_ID, Summoner_Name, Summoner_TagLine, Summoner_PUUID,Summoner_LvL, Summoner_Rank, Summoner_ID, Summoner_Icon_ID) VALUES (?, ?, ?, ?, ?, ?, ? , ?)";
+    const selectUserIdQuery = "SELECT * FROM Users WHERE User_Email = ?";
+    const insertLoLInfoQuery = "INSERT INTO LoL_Info (User_ID, Summoner_Name, Summoner_TagLine, Summoner_PUUID, Summoner_LvL, Summoner_Rank, Summoner_ID, Summoner_Icon_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     let connection;
 
@@ -21,12 +21,12 @@ module.exports = async (req, res) => {
         console.log("Utilisateur inséré");
 
         // Récupération de l'ID de l'utilisateur
-        const [userResult] = await connection.execute(selectUserIdQuery, [email]);
-        if (userResult.length === 0) {
+        const userResults = await connection.execute(selectUserIdQuery, [email]);
+        if (userResults.length === 0) {
             throw new Error("Failed to retrieve user ID after insertion.");
         }
-        console.log("User result:", userResult);
-        const userId = userResult.id; // Accéder correctement à l'ID
+        console.log("User result:", userResults);
+        const userId = userResults[0].id; // Accéder correctement à l'ID
 
         // Récupération du PUUID via l'API
         const puuidResponse = await axios.get(`http://localhost:3000/api/user/${username}/${tagline}`);
@@ -54,7 +54,6 @@ module.exports = async (req, res) => {
             console.log("No data for RANKED_SOLO_5x5");
         }
 
-
         // Insertion des informations LoL dans la base de données
         await connection.execute(insertLoLInfoQuery, [userId, username, tagline, puuid, lvl, rank, summId, iconId]);
 
@@ -64,7 +63,7 @@ module.exports = async (req, res) => {
         }
 
         req.session.user = {
-            email: userResult.User_Email,
+            email: userResults[0].User_Email,
             userId: userId,
             isLoggedIn: true,
         };
