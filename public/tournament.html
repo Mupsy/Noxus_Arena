@@ -7,23 +7,217 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 </head>
-<body>
-    <div>
-        <nav>
-            <div>
-                home
-            </div>
-            <div>
-<!--                join team & profile-->
-                <a href="/teams">pas d'equipe?</a>
-                profile image
-            </div>
-        </nav>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-950 dark:text-gray-300">
+<nav id="navbar" class="bg-gray-800 w-full"> <!-- w-full pour s'assurer que la navbar prend toute la largeur -->
 
+</nav>
+<div class="flex items-center justify-center my-5 flex-col h-screen">
+    <div>
+        <div>
+            Tu veux participer?
+        </div>
+
+        <div>
+            <button id="create-tournament">Créer ton tournoi</button>
+        </div>
     </div>
 
-    <script>
+    <div id="showTournamentsCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl px-4">
+        <!-- Tournament cards will be inserted here by JavaScript -->
+    </div>
 
-    </script>
+
+
+
+
+</div>
+
+<form action="" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg z-10" id="tournament-form">
+    <h2 class="text-lg font-bold mb-4">Créer un tournoi</h2>
+    <input type="text" id="tournament-name" name="tournament-name" placeholder="Nom du tournoi" class="w-full p-2 mb-4 border rounded">
+    <input type="number" id="max-teams" name="max-teams" placeholder="Nombre max d'equipes" max="8" min="4" class="w-full p-2 mb-4 border rounded">
+    <input type="submit" value="Submit" id="submit" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+</form>
+
+<!-- Overlay for form background -->
+<div id="form-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-0"></div>
+
+
 </body>
+<script>
+
+    $(document).ready(function () {
+
+        const createTournament = document.querySelector("#create-tournament");
+        const tournamentForm  = document.querySelector("#tournament-form");
+        const submitTournament = document.querySelector("#submit");
+        const formOverlay = document.querySelector("#form-overlay");
+
+
+        createTournament.addEventListener("click", () => {
+            tournamentForm.classList.remove("hidden");
+        })
+
+
+        formOverlay.addEventListener("click", () => {
+            tournamentForm.classList.add("hidden");
+            formOverlay.classList.add("hidden");
+        });
+
+        submitTournament.addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            const data = {
+                tournamentName: document.querySelector("#tournament-name").value,
+                maxTeams: document.querySelector("#max-teams").value
+            }
+            try{
+
+                const response = await fetch("/api/controller/create-tournament", {
+                    method: "POST",
+                    body: JSON.stringify(data),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+                console.log("Success", responseData);
+
+                // Hide form after successful submission
+                tournamentForm.classList.add("hidden");
+                formOverlay.classList.add("hidden");
+
+                // Refresh tournaments
+                await showTournaments();
+
+            } catch (error){
+                console.log(error);
+            }
+
+
+        });
+            //create a button to create a tournament (with name, and max teams)
+            //it then gets shown on the screen like a card
+            //other players can join said tournament with their team
+
+
+        async function showTournaments(){
+            try{
+                const response = await fetch("/api/controller/show-tournament");
+                console.log(response);
+                if (!response.ok) {
+                    console.error(response.status);
+                }
+                const data = await response.json();
+                console.log("Success", data);
+
+                // Clear existing tournament cards
+                const tournamentsContainer = document.getElementById("showTournamentsCards");
+                tournamentsContainer.innerHTML = "";
+
+                // Check if we have tournaments to display
+                if (data.data && data.data.length > 0) {
+                    // Loop through tournaments and create cards
+                    data.data.forEach(tournament => {
+                        const tournamentCard = createTournamentCard(tournament);
+                        tournamentsContainer.appendChild(tournamentCard);
+                    });
+                } else {
+                    // Display a message if no tournaments are available
+                    tournamentsContainer.innerHTML = `
+                        <div class="col-span-full text-center py-12">
+                            <h3 class="text-xl font-medium mb-2">Aucun tournoi disponible</h3>
+                            <p class="text-gray-500 mb-4">Soyez le premier à créer un tournoi!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        // Function to create a tournament card
+        function createTournamentCard(tournament) {
+            const card = document.createElement("div");
+            card.className = "bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-all hover:shadow-lg";
+
+            // Calculate percentage of teams filled
+            const fillPercentage = (tournament.Current_Teams / tournament.Max_Teams) * 100;
+            const isFull = tournament.Current_Teams >= tournament.Max_Teams;
+
+            card.innerHTML = `
+                <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-bold">${tournament.Tournament_Name}</h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trophy"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <span class="text-gray-600 dark:text-gray-300">${tournament.Current_Teams} / ${tournament.Max_Teams} équipes</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm">
+                            <span>Progression</span>
+                            <span>${Math.round(fillPercentage)}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${fillPercentage}%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 pb-4">
+                    <button
+                        class="w-full py-2 px-4 rounded font-medium ${isFull ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}"
+                        ${isFull ? 'disabled' : ''}
+                        onclick="joinTournament('${tournament.Tournament_Name}')"
+                    >
+                        ${isFull ? 'Tournoi complet' : 'Rejoindre le tournoi'}
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Add this function to the global scope so it can be called from the button
+        window.joinTournament = async function (tournamentName) {
+            console.log(`Joining tournament: ${tournamentName}`);
+
+            try {
+                const response = await fetch('/api/controller/join-tournament', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({tournamentName})
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    window.location.reload();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Error joining tournament:', error);
+                alert('Failed to join the tournament.');
+            }
+        };
+
+        showTournaments();
+
+        $('#navbar').load('./ressources/navbar.html');
+        $('#footer').load('./ressources/footer.html');
+
+    });
+</script>
 </html>

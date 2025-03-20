@@ -23,8 +23,8 @@
           Create a team</div>
       </div>
     </nav>
-    <div class="container mx-auto p-6">
-      show available teams
+    <div id="team-container" class="">
+
     </div>
 
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
@@ -45,23 +45,24 @@
           </select>
 
           <!-- <label for="champion" class="block text-gray-700 dark:text-gray-300 mb-2">Champion</label>
-          <input id="champion" type="text" class="w-full mb-4 p-2 border rounded-lg"
-            placeholder="Start typing a champion's name">
-          <div id="champion-dropdown"
-            class="hidden bg-white dark:bg-gray-800 border rounded-lg shadow-lg mt-2 p-2 max-h-48 overflow-y-auto">
-            Dropdown content will be dynamically added here -->
-      </div>
+        <input id="champion" type="text" class="w-full mb-4 p-2 border rounded-lg"
+          placeholder="Start typing a champion's name">
+        <div id="champion-dropdown"
+          class="hidden bg-white dark:bg-gray-800 border rounded-lg shadow-lg mt-2 p-2 max-h-48 overflow-y-auto">
+          Dropdown content will be dynamically added here
+    </div>-->
 
-      <button id="submit-team" type="submit"
-        class="w-full flex justify-center mt-6 text-white border-2 rounded-lg border-white border-solid">Submit</button>
-      </form>
-      <div class="flex justify-end mt-6">
-        <button id="closeModal" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-          Close
-        </button>
+          <button id="submit-team" type="submit"
+            class="w-full flex justify-center mt-6 text-white border-2 rounded-lg border-white border-solid">Submit</button>
+        </form>
+
+        <div class="flex justify-end mt-6">
+          <button id="closeModal" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+            Close
+          </button>
+        </div>
       </div>
     </div>
-  </div>
   </div>
   <script>
     $(document).ready(function () {
@@ -109,6 +110,71 @@
       //             });
       //   });
 
+      const fetchTeams = async () => {
+        try {
+          console.log("Fetching teams...")
+          const res = await $.getJSON("/api/controller/show-teams");
+          console.log("Response received:", res)
+          console.log("Data:", res.data)
+          return res.data
+        } catch (error) {
+          console.error("Error fetching teams:", error);
+          return []
+        }
+      }
+
+      const displayTeams = async () => {
+        const teams = await fetchTeams();
+
+        teams.forEach(team => {
+          const newTeam = document.createElement('div');
+          newTeam.classList.add('team');
+          newTeam.innerHTML = `
+      <div class="team card">
+        <form class="join-form ${team.Team_Name}">
+          <input type="text" class="teamName" name="teamName" value="${team.Team_Name}" readonly>
+          <select class="select ${team.Team_Name} block text-black mb-2" name="join-role">
+          </select>
+          <button class="join-team" type="submit" class="w-full flex justify-center mt-6 text-white border-2 rounded-lg border-white border-solid">Join</button>
+        </form>
+      </div>
+    `;
+
+          $('#team-container').append(newTeam);
+
+          // Sélection du select de façon dynamique avec backticks pour interpoler le nom d'équipe
+          const joinform = $(`.select .${team.Team_Name}`);
+
+          // Ajout des options en fonction des rôles disponibles
+          if (team.TOP == null) {
+            joinform.append('<option value="TOP">Top</option>');
+          }
+          if (team.JGL == null) {
+            joinform.append('<option value="JGL">Jungle</option>');
+          }
+          if (team.MID == null) {
+            joinform.append('<option value="MID">Middle</option>');
+          }
+          if (team.ADC == null) {
+            joinform.append('<option value="ADC">ADC</option>');
+          }
+          if (team.SUP == null) {
+            joinform.append('<option value="SUP">Sup</option>');
+          }
+        });
+      };
+
+      displayTeams()
+
+
+
+
+
+
+
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////
+
       $("#team-creator").click(function () {
         $("#modal").removeClass("hidden").fadeIn();
       })
@@ -151,6 +217,42 @@
             console.error(error);
           }
         })
+      })
+    })
+
+    $(".join-team").click(function (e) {
+      e.preventDefault();
+
+
+
+      if (!teamName) {
+        alert("Please enter a team name");
+        return;
+      }
+      const playerRole = $("#select").val();
+      // const champion = $("#champion").val();
+
+      const data = {
+        teamName: teamName,
+        playerRole: playerRole,
+      }
+      $.ajax({
+        url: "/api/controller/team",
+        method: "POST",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        dataType: "json",
+        success: function (response) {
+          if (response.success) {
+            console.log(response);
+            alert("Team created");
+          } else {
+            alert("Failed to create team" + response.error);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        }
       })
     })
   </script>
