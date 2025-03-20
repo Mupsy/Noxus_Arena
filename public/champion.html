@@ -632,6 +632,7 @@
       
       // Gérer les onglets
       document.getElementById('tab-builds').addEventListener('click', () => switchTab('builds'));
+      
       document.getElementById('tab-stats').addEventListener('click', () => switchTab('stats'));
       document.getElementById('tab-counters').addEventListener('click', () => switchTab('counters'));
       document.getElementById('tab-skills').addEventListener('click', () => switchTab('skills'));
@@ -785,7 +786,8 @@
       starterContainer.innerHTML = '';
       
       buildData.starter.forEach(itemId => {
-        starterContainer.appendChild(createItemElement(itemId));
+        const itemElement = createItemElement(itemId);
+        starterContainer.appendChild(itemElement);
       });
       
       // Mettre à jour les items core
@@ -793,7 +795,8 @@
       coreContainer.innerHTML = '';
       
       buildData.core.forEach(itemId => {
-        coreContainer.appendChild(createItemElement(itemId));
+        const itemElement = createItemElement(itemId);
+        coreContainer.appendChild(itemElement);
       });
       
       // Mettre à jour les items légendaires
@@ -801,7 +804,8 @@
       legendaryContainer.innerHTML = '';
       
       buildData.legendary.forEach(itemId => {
-        legendaryContainer.appendChild(createItemElement(itemId));
+        const itemElement = createItemElement(itemId);
+        legendaryContainer.appendChild(itemElement);
       });
       
       // Mettre à jour les items situationnels
@@ -809,7 +813,8 @@
       situationalContainer.innerHTML = '';
       
       buildData.situational.forEach(itemId => {
-        situationalContainer.appendChild(createItemElement(itemId));
+        const itemElement = createItemElement(itemId);
+        situationalContainer.appendChild(itemElement);
       });
     }
     
@@ -819,7 +824,7 @@
       itemElement.className = 'item-icon tooltip';
       
       const img = document.createElement('img');
-      img.src = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/${itemId}.png`;
+      img.src = `https://ddragon.leagueoflegends.com/cdn/15.3.1/img/item/${itemId}.png`;
       img.alt = `Item ${itemId}`;
       
       const tooltip = document.createElement('span');
@@ -863,18 +868,96 @@
       });
     }
     
+    // Remplacer la fonction createRuneElement par cette nouvelle version qui utilise le nouveau format d'URL des runes
+
     // Fonction pour créer un élément de rune
     function createRuneElement(runeId) {
       const runeElement = document.createElement('div');
       runeElement.className = 'rune-icon tooltip';
       
       const img = document.createElement('img');
-      img.src = `https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/${runeId}.png`;
+      
+      // Nouvelle correspondance entre les IDs de runes et leurs chemins
+      const runePathMap = {
+        // Precision (Précision)
+        8005: 'Precision/PressTheAttack/PressTheAttack.png', // Press the Attack
+        8008: 'Precision/LethalTempo/LethalTempoTemp.png', // Lethal Tempo
+        8010: 'Precision/Conqueror/Conqueror.png', // Conqueror
+        8021: 'Precision/FleetFootwork/FleetFootwork.png', // Fleet Footwork
+        
+        // Domination (Domination)
+        8112: 'Domination/Electrocute/Electrocute.png', // Electrocute
+        8124: 'Domination/Predator/Predator.png', // Predator
+        8128: 'Domination/DarkHarvest/DarkHarvest.png', // Dark Harvest
+        9923: 'Domination/HailOfBlades/HailOfBlades.png', // Hail of Blades
+        
+        // Sorcery (Sorcellerie)
+        8214: 'Sorcery/SummonAery/SummonAery.png', // Summon Aery
+        8229: 'Sorcery/ArcaneComet/ArcaneComet.png', // Arcane Comet
+        8230: 'Sorcery/PhaseRush/PhaseRush.png', // Phase Rush
+        
+        // Resolve (Détermination)
+        8437: 'Resolve/GraspOfTheUndying/GraspOfTheUndying.png', // Grasp of the Undying
+        8439: 'Resolve/VeteranAftershock/VeteranAftershock.png', // Aftershock
+        8465: 'Resolve/Guardian/Guardian.png', // Guardian
+        
+        // Inspiration (Inspiration)
+        8351: 'Inspiration/GlacialAugment/GlacialAugment.png', // Glacial Augment
+        8360: 'Inspiration/UnsealedSpellbook/UnsealedSpellbook.png', // Unsealed Spellbook
+        8358: 'Inspiration/MasterKey/MasterKey.png', // First Strike
+        
+        // Runes secondaires Precision
+        8009: 'Precision/PresenceOfMind/PresenceOfMind.png', // Presence of Mind
+        8017: 'Precision/CoupDeGrace/CoupDeGrace.png', // Coup de Grace
+        8014: 'Precision/LegendAlacrity/LegendAlacrity.png', // Legend: Alacrity
+        8299: 'Precision/LastStand/LastStand.png', // Last Stand
+        
+        // Runes secondaires Domination
+        8126: 'Domination/CheapShot/CheapShot.png', // Cheap Shot
+        8139: 'Domination/TasteOfBlood/GreenTerror_TasteOfBlood.png', // Taste of Blood
+        8143: 'Domination/SuddenImpact/SuddenImpact.png', // Sudden Impact
+        8135: 'Domination/RavenousHunter/RavenousHunter.png', // Ravenous Hunter
+        
+        // Runes secondaires Sorcery
+        8210: 'Sorcery/Transcendence/Transcendence.png', // Transcendence
+        8226: 'Sorcery/ManaflowBand/ManaflowBand.png', // Manaflow Band
+        8233: 'Sorcery/AbsoluteFocus/AbsoluteFocus.png', // Absolute Focus
+        8237: 'Sorcery/Scorch/Scorch.png', // Scorch
+        
+        // Runes secondaires Resolve
+        8446: 'Resolve/Demolish/Demolish.png', // Demolish
+        8444: 'Resolve/FontOfLife/FontOfLife.png', // Font of Life
+        8451: 'Resolve/Overgrowth/Overgrowth.png', // Overgrowth
+        8453: 'Resolve/Revitalize/Revitalize.png', // Revitalize
+        
+        // Runes secondaires Inspiration
+        8306: 'Inspiration/HextechFlashtraption/HextechFlashtraption.png', // Hextech Flashtraption
+        8345: 'Inspiration/BiscuitDelivery/BiscuitDelivery.png', // Biscuit Delivery
+        8347: 'Inspiration/CosmicInsight/CosmicInsight.png', // Cosmic Insight
+        8410: 'Inspiration/ApproachVelocity/ApproachVelocity.png', // Approach Velocity
+        
+        // Fragments de statistiques
+        5008: 'StatMods/StatModsAdaptiveForceIcon.png', // Adaptive Force
+        5005: 'StatMods/StatModsAttackSpeedIcon.png', // Attack Speed
+        5007: 'StatMods/StatModsCDRScalingIcon.png', // Ability Haste
+        5002: 'StatMods/StatModsArmorIcon.png', // Armor
+        5003: 'StatMods/StatModsMagicResIcon.png', // Magic Resist
+        5001: 'StatMods/StatModsHealthScalingIcon.png', // Health
+      };
+      
+      // Utiliser le chemin correspondant à l'ID de la rune, ou un chemin par défaut
+      const runePath = runePathMap[runeId] || 'Precision/PressTheAttack/PressTheAttack.png';
+      
+      // Construire l'URL complète
+      img.src = `https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/${runePath}`;
       img.alt = `Rune ${runeId}`;
+      
+      // Obtenir le nom de la rune à partir du chemin
+      const runeName = runePath.split('/').pop().replace('.png', '');
       
       const tooltip = document.createElement('span');
       tooltip.className = 'tooltiptext';
-      tooltip.textContent = `Rune ${runeId}`;
+      tooltip.textContent = runeName;
       
       runeElement.appendChild(img);
       runeElement.appendChild(tooltip);
@@ -892,7 +975,7 @@
         spellElement.className = 'spell-icon tooltip';
         
         const img = document.createElement('img');
-        img.src = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/spell/Summoner${getSpellName(spellId)}.png`;
+        img.src = `https://ddragon.leagueoflegends.com/cdn/15.3.1/img/spell/Summoner${getSpellName(spellId)}.png`;
         img.alt = `Sort ${spellId}`;
         
         const tooltip = document.createElement('span');
@@ -976,7 +1059,7 @@
         championInfo.className = 'flex items-center';
         
         const img = document.createElement('img');
-        img.src = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${getChampionKeyById(counter.championId)}.png`;
+        img.src = `https://ddragon.leagueoflegends.com/cdn/15.3.1/img/champion/${getChampionKeyById(counter.championId)}.png`;
         img.alt = `Champion ${counter.championId}`;
         img.className = 'w-12 h-12 rounded-full mr-3 shadow-md';
         
@@ -1019,7 +1102,7 @@
         championInfo.className = 'flex items-center';
         
         const img = document.createElement('img');
-        img.src = `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/champion/${getChampionKeyById(synergy.championId)}.png`;
+        img.src = `https://ddragon.leagueoflegends.com/cdn/15.3.1/img/champion/${getChampionKeyById(synergy.championId)}.png`;
         img.alt = `Champion ${synergy.championId}`;
         img.className = 'w-12 h-12 rounded-full mr-3 shadow-md';
         
@@ -1267,3 +1350,5 @@
   </script>
 </body>
 </html>
+
+  
