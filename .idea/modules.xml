@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/.idea/Noxus_Arena.iml" filepath="$PROJECT_DIR$/.idea/Noxus_Arena.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/.idea/Projets.iml" filepath="$PROJECT_DIR$/.idea/Projets.iml" />
+>>>>>>> 4a0b130 (fini tournoi)
     </modules>
   </component>
 </project>

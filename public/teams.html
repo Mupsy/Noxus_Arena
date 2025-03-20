@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Title</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -10,150 +12,254 @@
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 </head>
 
+
 <body>
-  <div>
-    <nav class="flex items-center justify-between flex-wrap bg-gray-800 p-6">
-      <div class="flex items-center flex-shrink-0 text-white mr-6">
-        <a href="/" class="text-xl font-semibold text-white">
-          <img src="./ressources/logo_noxus_arena.png" alt="Noxus Arena Logo" class="w-12 h-12 rounded-full mr-2" />
-        </a>
-      </div>
-      <div class="block">
-        <div id="team-creator" class="border-solid border-2 border-black p-1 rounded-lg text-slate-300 cursor-pointer">
-          Create a team</div>
-      </div>
-    </nav>
-    <div class="container mx-auto p-6">
-      show available teams
+<div>
+  <nav class="flex items-center justify-between flex-wrap bg-gray-800 p-6">
+    <div class="flex items-center flex-shrink-0 text-white mr-6">
+      <a href="/" class="text-xl font-semibold text-white">
+        <img src="./ressources/logo_noxus_arena.png" alt="Noxus Arena Logo" class="w-12 h-12 rounded-full mr-2" />
+      </a>
     </div>
+    <div class="block">
+      <div id="team-creator" class="border-solid border-2 border-black p-1 rounded-lg text-slate-300 cursor-pointer">
+        Create a team</div>
+    </div>
+  </nav>
+  <div id="team-container" class="">
 
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-11/12 max-w-md">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Create your team</h2>
-        <form id="team-form">
+  </div>
 
-          <label for="team-name" class="block text-gray-700 dark:text-gray-300 mb-2">Team Name</label>
-          <input id="team-name" type="text" name="teamName">
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-11/12 max-w-md">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Create your team</h2>
+      <form id="team-form">
 
-          <label for="player-role" class="block text-gray-700 dark:text-gray-300 mb-2">Player Role</label>
-          <select id="player-role" name="player-role" class="block text-black mb-2">
-            <option value="TOP" selected>Top</option>
-            <option value="JGL">Jungle</option>
-            <option value="MID">Middle</option>
-            <option value="ADC">ADC</option>
-            <option value="SUP">Support</option>
+        <label for="team-name" class="block text-gray-700 dark:text-gray-300 mb-2">Team Name</label>
+        <input id="team-name" type="text" name="teamName">
+
+        <label for="player-role" class="block text-gray-700 dark:text-gray-300 mb-2">Player Role</label>
+        <select id="player-role" name="player-role" class="block text-black mb-2">
+          <option value="TOP" selected>Top</option>
+          <option value="JGL">Jungle</option>
+          <option value="MID">Middle</option>
+          <option value="ADC">ADC</option>
+          <option value="SUP">Support</option>
+        </select>
+
+        <!-- <label for="champion" class="block text-gray-700 dark:text-gray-300 mb-2">Champion</label>
+        <input id="champion" type="text" class="w-full mb-4 p-2 border rounded-lg"
+          placeholder="Start typing a champion's name">
+        <div id="champion-dropdown"
+          class="hidden bg-white dark:bg-gray-800 border rounded-lg shadow-lg mt-2 p-2 max-h-48 overflow-y-auto">
+          Dropdown content will be dynamically added here
+    </div>-->
+
+    <button id="submit-team" type="submit"
+            class="w-full flex justify-center mt-6 text-white border-2 rounded-lg border-white border-solid">Submit</button>
+    </form>
+
+    <div class="flex justify-end mt-6">
+      <button id="closeModal" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+<script>
+  $(document).ready(function () {
+
+    //   let champions = [];
+    //   const fetchChampions = async () => {
+    //     try {
+    //       const versionRes = await $.getJSON("https://ddragon.leagueoflegends.com/api/versions.json");
+    //       const latestVersion = versionRes[0];
+    //       const championsRes = await $.getJSON(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/champion.json`);
+
+    //       champions = Object.values(championsRes.data).map(champion => ({
+    //         name: champion.name,
+    //         image: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champion.image.full}`,
+    //       }));
+    //     } catch (error) {
+    //       console.error("Error fetching champions:", error);
+    //     }
+    //   };
+
+    //   fetchChampions();
+
+    //   $("#champion").on("input", function () {
+    //     const searchValue = $(this).val().toLowerCase();
+    //     $("#champion-dropdown").empty().removeClass("hidden");
+
+    //     if (!searchValue) {
+    //       $("#champion-dropdown").addClass("hidden");
+    //       $("#background-content").removeClass("hidden");
+    //       return;
+    //     }
+
+    //     $("#background-content").addClass("hidden");
+
+    //     champions
+    //             .filter(champ => champ.name.toLowerCase().includes(searchValue))
+    //             .slice(0, 10)
+    //             .forEach(champ => {
+    //               $("#champion-dropdown").append(`
+    //           <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+    //             <img src="${champ.image}" alt="${champ.name}" class="w-8 h-8 rounded-full mr-2">
+    //             <span class="text-gray-800 dark:text-gray-300">${champ.name}</span>
+    //           </div>
+    //         `);
+    //             });
+    //   });
+
+    const fetchTeams = async () => {
+      try {
+        console.log("Fetching teams...")
+        const res = await $.getJSON("/api/controller/show-teams");
+        console.log("Response received:", res)
+        console.log("Data:", res.data)
+        return res.data
+      } catch (error) {
+        console.error("Error fetching teams:", error);
+        return []
+      }
+    }
+
+    const displayTeams = async () => {
+      const teams = await fetchTeams();
+
+      teams.forEach(team => {
+        const newTeam = document.createElement('div');
+        newTeam.classList.add('team');
+        newTeam.innerHTML = `
+      <div class="team card">
+        <form class="join-form ${team.Team_Name}">
+          <input type="text" class="teamName" name="teamName" value="${team.Team_Name}" readonly>
+          <select class="select ${team.Team_Name} block text-black mb-2" name="join-role">
           </select>
-
-          <!-- <label for="champion" class="block text-gray-700 dark:text-gray-300 mb-2">Champion</label>
-          <input id="champion" type="text" class="w-full mb-4 p-2 border rounded-lg"
-            placeholder="Start typing a champion's name">
-          <div id="champion-dropdown"
-            class="hidden bg-white dark:bg-gray-800 border rounded-lg shadow-lg mt-2 p-2 max-h-48 overflow-y-auto">
-            Dropdown content will be dynamically added here -->
+          <button class="join-team" type="submit" class="w-full flex justify-center mt-6 text-white border-2 rounded-lg border-white border-solid">Join</button>
+        </form>
       </div>
+    `;
 
-      <button id="submit-team" type="submit"
-        class="w-full flex justify-center mt-6 text-white border-2 rounded-lg border-white border-solid">Submit</button>
-      </form>
-      <div class="flex justify-end mt-6">
-        <button id="closeModal" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-  </div>
-  <script>
-    $(document).ready(function () {
+        $('#team-container').append(newTeam);
 
-      //   let champions = [];
-      //   const fetchChampions = async () => {
-      //     try {
-      //       const versionRes = await $.getJSON("https://ddragon.leagueoflegends.com/api/versions.json");
-      //       const latestVersion = versionRes[0];
-      //       const championsRes = await $.getJSON(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/champion.json`);
+        // Sélection du select de façon dynamique avec backticks pour interpoler le nom d'équipe
+        const joinform = $(`.select .${team.Team_Name}`);
 
-      //       champions = Object.values(championsRes.data).map(champion => ({
-      //         name: champion.name,
-      //         image: `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${champion.image.full}`,
-      //       }));
-      //     } catch (error) {
-      //       console.error("Error fetching champions:", error);
-      //     }
-      //   };
-
-      //   fetchChampions();
-
-      //   $("#champion").on("input", function () {
-      //     const searchValue = $(this).val().toLowerCase();
-      //     $("#champion-dropdown").empty().removeClass("hidden");
-
-      //     if (!searchValue) {
-      //       $("#champion-dropdown").addClass("hidden");
-      //       $("#background-content").removeClass("hidden");
-      //       return;
-      //     }
-
-      //     $("#background-content").addClass("hidden");
-
-      //     champions
-      //             .filter(champ => champ.name.toLowerCase().includes(searchValue))
-      //             .slice(0, 10)
-      //             .forEach(champ => {
-      //               $("#champion-dropdown").append(`
-      //           <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-      //             <img src="${champ.image}" alt="${champ.name}" class="w-8 h-8 rounded-full mr-2">
-      //             <span class="text-gray-800 dark:text-gray-300">${champ.name}</span>
-      //           </div>
-      //         `);
-      //             });
-      //   });
-
-      $("#team-creator").click(function () {
-        $("#modal").removeClass("hidden").fadeIn();
-      })
-
-      $("#closeModal").click(function () {
-        $("#modal").addClass("hidden").fadeOut();
-      })
-
-      $("#submit-team").click(function (e) {
-        e.preventDefault();
-
-        const teamName = $("#team-name").val();
-
-        if (!teamName) {
-          alert("Please enter a team name");
-          return;
+        // Ajout des options en fonction des rôles disponibles
+        if (team.TOP == null) {
+          joinform.append('<option value="TOP">Top</option>');
         }
-        const playerRole = $("#player-role").val();
-        // const champion = $("#champion").val();
-
-        const data = {
-          teamName: teamName,
-          playerRole: playerRole,
+        if (team.JGL == null) {
+          joinform.append('<option value="JGL">Jungle</option>');
         }
-        $.ajax({
-          url: "/api/controller/team",
-          method: "POST",
-          data: JSON.stringify(data),
-          contentType: "application/json",
-          dataType: "json",
-          success: function (response) {
-            if (response.success) {
-              console.log(response);
-              alert("Team created");
-            } else {
-              alert("Failed to create team" + response.error);
-            }
-          },
-          error: function (error) {
-            console.error(error);
+        if (team.MID == null) {
+          joinform.append('<option value="MID">Middle</option>');
+        }
+        if (team.ADC == null) {
+          joinform.append('<option value="ADC">ADC</option>');
+        }
+        if (team.SUP == null) {
+          joinform.append('<option value="SUP">Sup</option>');
+        }
+      });
+    };
+
+    displayTeams()
+
+
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    $("#team-creator").click(function () {
+      $("#modal").removeClass("hidden").fadeIn();
+    })
+
+    $("#closeModal").click(function () {
+      $("#modal").addClass("hidden").fadeOut();
+    })
+
+    $("#submit-team").click(function (e) {
+      e.preventDefault();
+
+      const teamName = $("#team-name").val();
+
+      if (!teamName) {
+        alert("Please enter a team name");
+        return;
+      }
+      const playerRole = $("#player-role").val();
+      // const champion = $("#champion").val();
+
+      const data = {
+        teamName: teamName,
+        playerRole: playerRole,
+      }
+      $.ajax({
+        url: "/api/controller/team",
+        method: "POST",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        dataType: "json",
+        success: function (response) {
+          if (response.success) {
+            console.log(response);
+            alert("Team created");
+          } else {
+            alert("Failed to create team" + response.error);
           }
-        })
+        },
+        error: function (error) {
+          console.error(error);
+        }
       })
     })
-  </script>
+  })
+
+  $(".join-team").click(function (e) {
+    e.preventDefault();
+
+
+
+    if (!teamName) {
+      alert("Please enter a team name");
+      return;
+    }
+    const playerRole = $("#select").val();
+    // const champion = $("#champion").val();
+
+    const data = {
+      teamName: teamName,
+      playerRole: playerRole,
+    }
+    $.ajax({
+      url: "/api/controller/team",
+      method: "POST",
+      data: JSON.stringify(data),
+      contentType: "application/json",
+      dataType: "json",
+      success: function (response) {
+        if (response.success) {
+          console.log(response);
+          alert("Team created");
+        } else {
+          alert("Failed to create team" + response.error);
+        }
+      },
+      error: function (error) {
+        console.error(error);
+      }
+    })
+  })
+</script>
 </body>
+
 
 </html>
