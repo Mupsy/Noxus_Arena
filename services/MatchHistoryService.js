@@ -2,7 +2,7 @@ const axios = require('axios');
 const con = require('../models/ConnectToDatabase');
 
 // Utiliser la clé d'API fournie
-const RIOT_API_KEY = process.env.RIOT_API_KEY || 'RGAPI-bed67140-896f-478c-ad57-9ba668f1e82c';
+const RIOT_API_KEY = process.env.RIOT_API_KEY;
 
 // Constantes pour les régions
 const REGION = 'europe'; // Pour les matchs (europe, asia, americas)
