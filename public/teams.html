@@ -199,30 +199,31 @@
       const playerRole = $("#player-role").val();
       // const champion = $("#champion").val();
 
-      const data = {
-        teamName: teamName,
-        playerRole: playerRole,
-      }
-      $.ajax({
-        url: "/api/controller/team",
-        method: "POST",
-        data: JSON.stringify(data),
-        contentType: "application/json",
-        dataType: "json",
-        success: function (response) {
-          if (response.success) {
-            console.log(response);
-            alert("Team created");
-          } else {
-            alert("Failed to create team" + response.error);
-          }
-        },
-        error: function (error) {
-          console.error(error);
+        const data = {
+          teamName: teamName,
+          playerRole: playerRole,
         }
+        $.ajax({
+          url: "/api/controller/team",
+          method: "POST",
+          data: JSON.stringify(data),
+          contentType: "application/json",
+          dataType: "json",
+          success: function (response) {
+            if (response.success) {
+              console.log(response);
+              alert("Team created");
+              window.location.reload();
+            } else {
+              alert("Failed to create team" + response.error);
+            }
+          },
+          error: function (error) {
+            console.error(error);
+          }
+        })
       })
     })
-  })
 
 
     $(document).on("click", ".join-team", function (e) {
