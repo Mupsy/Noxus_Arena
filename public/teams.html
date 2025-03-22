@@ -138,15 +138,16 @@
           <input type="text" class="teamName" name="teamName" value="${team.Team_Name}" readonly>
           <select class="select ${team.Team_Name} block text-black mb-2" name="join-role">
           </select>
-          <button class="join-team" type="submit" class="w-full flex justify-center mt-6 text-white border-2 rounded-lg border-white border-solid">Join</button>
+          <button class="join-team" type="submit" >Join</button>
         </form>
       </div>
     `;
 
         $('#team-container').append(newTeam);
 
-        // Sélection du select de façon dynamique avec backticks pour interpoler le nom d'équipe
-        const joinform = $(`.select .${team.Team_Name}`);
+          // Sélection du select de façon dynamique avec backticks pour interpoler le nom d'équipe
+          const joinform = $(`.select.${team.Team_Name}`);
+
 
         // Ajout des options en fonction des rôles disponibles
         if (team.TOP == null) {
@@ -223,42 +224,48 @@
     })
   })
 
-  $(".join-team").click(function (e) {
-    e.preventDefault();
 
+    $(document).on("click", ".join-team", function (e) {
+      e.preventDefault();
 
-
-    if (!teamName) {
-      alert("Please enter a team name");
-      return;
-    }
-    const playerRole = $("#select").val();
-    // const champion = $("#champion").val();
-
-    const data = {
-      teamName: teamName,
-      playerRole: playerRole,
-    }
-    $.ajax({
-      url: "/api/controller/team",
-      method: "POST",
-      data: JSON.stringify(data),
-      contentType: "application/json",
-      dataType: "json",
-      success: function (response) {
-        if (response.success) {
-          console.log(response);
-          alert("Team created");
-        } else {
-          alert("Failed to create team" + response.error);
-        }
-      },
-      error: function (error) {
-        console.error(error);
+      // Récupère la valeur du nom de l'équipe depuis l'input du formulaire courant
+      const teamName = $(this).closest("form").find(".teamName").val();
+      if (!teamName) {
+        alert("Please enter a team name");
+        return;
       }
-    })
-  })
-</script>
+
+      // Récupère la valeur du rôle choisi dans ce formulaire
+      const playerRole = $(this).closest("form").find("select[name='join-role']").val();
+
+      const data = {
+        teamId: teamName, // Ici, on envoie le nom de l'équipe (ou un identifiant, si vous en avez un)
+        playerRole: playerRole,
+      };
+      console.log(data)
+
+      $.ajax({
+        url: "/api/controller/join-team",
+        method: "POST",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        dataType: "json",
+        success: function (response) {
+          if (response.success) {
+            console.log(response);
+            alert("Joined team successfully!");
+            window.location.reload();
+          } else {
+            alert("Failed to join team: " + response.message);
+          }
+        },
+        error: function (error) {
+          console.error(error);
+        }
+      });
+    });
+
+  </script>
 </body>
 
 

@@ -2,11 +2,11 @@ var mariadb = require('mariadb');
 require("dotenv").config();
 
 var con = mariadb.createPool({
-    host: "localhost",
+    host: "127.0.0.1",
 
     user: process.env.USER_BDD,
     password: process.env.USER_BDD_PW,
-    database:"noxus_arena",
+    database:"Noxus_arena",
     port: 3306,
     connectionLimit: 50,  // Augmenter le nombre de connexions dans le pool
     connectTimeout: 20000
