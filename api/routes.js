@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 
 // Importer ton fichier de routes (controller/login.js)
 const loginController = require('../controller/login');
+const logoutController = require('../controller/logout');
 const registerController = require('../controller/register');
 const LoLInfoController = require ('../controller/LoLInfoController');
 const teamController = require('../controller/teams');
@@ -51,6 +52,16 @@ router.post('/api/controller/login', (req, res) => {
   req.body.password = password;  // Ajouter password dans req.body
   loginController(req, res);  // Appeler votre contrôleur en passant la requête et la réponse
 });
+
+router.post('/api/controller/logout', async (req, res) => {
+  try {
+    await logoutController(req, res);
+  } catch (error) {
+    console.error("Error in logout route:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+})
+
 
 router.post('/api/controller/register', (req, res) => {
   // Ajouter les paramètres de query à la requête
